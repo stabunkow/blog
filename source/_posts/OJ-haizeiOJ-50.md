@@ -37,7 +37,7 @@ tags: [OJ, haizeiOJ, 动态规划, 递推]
 
 $dp[i][j]=\min\limits_{1\le k \le j}{\{\max\left\{\begin{aligned}&dp[i-1][k-1]+1&鸡蛋碎了\\&dp[i][j-k]+1 &鸡蛋没碎\end{aligned}\right.} \}$
 
-第一版代码：
+第一版代码：时间复杂度 $O(n \times m ^2)$，$n$ 为鸡蛋数，$m$ 为楼层数
 
 ```cpp
 #include <bits/stdc++.h>
@@ -70,7 +70,7 @@ int main() {
 
 根据状态转移方程，碎和没碎的增长数量趋势是相反的，$dp[i][j]$ 在 $i, j$ 较大时具有较大值，所以可以判断随着 $k$ 的增加，$dp[i][j-k]$ 减少，$dp[i-1][k-1]$ 增加，最优的 $k$ 值一定在这两者交界处，这样可以优化掉循环 $\min$ 逻辑：
 
-第二版代码：
+第二版代码：时间复杂度 $O(n \times m)$，$n$ 为鸡蛋数，$m$ 为楼层数
 
 ```cpp
 #include <bits/stdc++.h>
@@ -134,7 +134,7 @@ public:
 
 $f[i][j] = f[i - 1][j - 1] + f[i][j - 1] + 1$
 
-第三版代码：
+第三版代码：时间复杂度 $O(n \times m)$，$n$ 为鸡蛋数，$m$ 为预测扔的次数
 
 ```cpp
 #include <bits/stdc++.h>
