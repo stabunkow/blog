@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"stabunkow.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","version":"8.2.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="红黑树 前置知识：了解二叉排序树、AVL 树的原理及代码实现。 性质  结点是红色或者黑色 根结点是红色 所有叶子结点（NIL）是黑色 红色结点的两个子结点都是黑色 从根结点到叶子结点的路径上，黑色数目相同  红黑树从根结点到叶子结点的最长路径是最短路径的 2 倍，比 AVL 树高控制条件更松散。 插入调整 把每一种情况，想象成一棵大的红黑树中的局部子树，局部调整的时候，为了不影响全局，调整前后的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OJ-红黑树">
+<meta property="og:url" content="http://stabunkow.github.io/blog/2021/03/03/%E7%BA%A2%E9%BB%91%E6%A0%91/index.html">
+<meta property="og:site_name" content="Hauk&#39;s Blog">
+<meta property="og:description" content="红黑树 前置知识：了解二叉排序树、AVL 树的原理及代码实现。 性质  结点是红色或者黑色 根结点是红色 所有叶子结点（NIL）是黑色 红色结点的两个子结点都是黑色 从根结点到叶子结点的路径上，黑色数目相同  红黑树从根结点到叶子结点的最长路径是最短路径的 2 倍，比 AVL 树高控制条件更松散。 插入调整 把每一种情况，想象成一棵大的红黑树中的局部子树，局部调整的时候，为了不影响全局，调整前后的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210302155608373.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210302161218195.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210302162209829.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210302172126840.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210303152431326.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210303153927166.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210303160113942.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210303195650564.png">
+<meta property="article:published_time" content="2021-03-03T11:25:41.000Z">
+<meta property="article:modified_time" content="2021-03-03T13:19:43.794Z">
+<meta property="article:author" content="Hauk">
+<meta property="article:tag" content="OJ">
+<meta property="article:tag" content="haizeiOJ">
+<meta property="article:tag" content="二叉树">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210302155608373.png">
+
+
+<link rel="canonical" href="http://stabunkow.github.io/blog/2021/03/03/%E7%BA%A2%E9%BB%91%E6%A0%91/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>OJ-红黑树 | Hauk's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hauk's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">~ o ha yo ~</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BA%A2%E9%BB%91%E6%A0%91"><span class="nav-number">1.</span> <span class="nav-text">红黑树</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%A7%E8%B4%A8"><span class="nav-number">1.1.</span> <span class="nav-text">性质</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8F%92%E5%85%A5%E8%B0%83%E6%95%B4"><span class="nav-number">1.2.</span> <span class="nav-text">插入调整</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%83%85%E5%86%B51"><span class="nav-number">1.2.1.</span> <span class="nav-text">情况1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%83%85%E5%86%B52"><span class="nav-number">1.2.2.</span> <span class="nav-text">情况2</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%A0%E9%99%A4%E8%B0%83%E6%95%B4"><span class="nav-number">1.3.</span> <span class="nav-text">删除调整</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%83%85%E5%86%B51-1"><span class="nav-number">1.3.1.</span> <span class="nav-text">情况1</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%83%85%E5%86%B52-1"><span class="nav-number">1.3.2.</span> <span class="nav-text">情况2</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%83%85%E5%86%B53"><span class="nav-number">1.3.3.</span> <span class="nav-text">情况3</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%83%85%E5%86%B54"><span class="nav-number">1.3.4.</span> <span class="nav-text">情况4</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0"><span class="nav-number">1.4.</span> <span class="nav-text">代码实现</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Hauk</p>
+  <div class="site-description" itemprop="description">Try to write something.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/blog/archives">
+          <span class="site-state-item-count">18</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://stabunkow.github.io/blog/2021/03/03/%E7%BA%A2%E9%BB%91%E6%A0%91/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="Hauk">
+      <meta itemprop="description" content="Try to write something.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hauk's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          OJ-红黑树
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-03-03 19:25:41 / 修改时间：21:19:43" itemprop="dateCreated datePublished" datetime="2021-03-03T19:25:41+08:00">2021-03-03</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="红黑树">红黑树</h1>
+<p>前置知识：了解二叉排序树、AVL 树的原理及代码实现。</p>
+<h2 id="性质">性质</h2>
+<ol type="1">
+<li>结点是红色或者黑色</li>
+<li>根结点是红色</li>
+<li>所有叶子结点（NIL）是黑色</li>
+<li>红色结点的两个子结点都是黑色</li>
+<li>从根结点到叶子结点的路径上，黑色数目相同</li>
+</ol>
+<p>红黑树从根结点到叶子结点的最长路径是最短路径的 2 倍，比 AVL 树高控制条件更松散。</p>
+<h2 id="插入调整">插入调整</h2>
+<p>把每一种情况，想象成一棵大的红黑树中的局部子树，局部调整的时候，为了不影响全局，调整前后的路径上黑色数量相同，所以新插入的节点一定是红色。若直接插入到黑色结点后面，之后不需要进行调整。</p>
+<p>插入过程要站在祖父结点去理解，主要是为了查看叔结点，逐渐向上来调整更大的局部树的 <strong>回溯调整过程</strong> 中，消除红色结点相连情况（此时父节点为红色，祖父结点一定为黑色）：</p>
+<h3 id="情况1">情况1</h3>
+<p>回溯调整过程中，出现父节点和被调整结点都为红色的情况，叔结点为红色结点。</p>
+<p>通过叔结点还有父节点红颜色上浮，祖父结点颜色变为红色修改。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210302155608373.png" /></p>
+<h3 id="情况2">情况2</h3>
+<p>对于被调整的结点 x 来说，叔结点是黑色，若先进行颜色调整肯定存在 **黑色结点数量失衡的情况，所以先用 AVL 的调整策略来进行左旋、右旋等操作后，再进行颜色上浮或者父结点颜色下沉调整操作。</p>
+<figure>
+<img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210302161218195.png" alt="失衡调整" /><figcaption>失衡调整</figcaption>
+</figure>
+<figure>
+<img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210302162209829.png" alt="颜色调整" /><figcaption>颜色调整</figcaption>
+</figure>
+<h2 id="删除调整">删除调整</h2>
+<p>被删除结点有以下情况：</p>
+<ol type="1">
+<li>若无子结点时（非 NIL 结点），被删除结点为红色，直接删除，不会影响红黑树；被删除结点为黑色，删除后该节点视为 NIL 结点，并使其变成 双重黑 结点，在后续调整中减少这重黑色</li>
+<li>若有 1 个子结点时，度为 1 的结点一定为黑色结点，其子结点为红色，用子结点代替被删除结点，颜色改成黑色</li>
+<li>若有 2 个子结点时，跟二叉排序树一样，用后继结点替代被删除的结点后，视为后继结点被删除，再根据情况 1、2 来进行调整。</li>
+</ol>
+<p>对于 双重黑结点 向上 <strong>回溯调整</strong> 的过程中，又有以下几种情况再进行调整，消除双重黑情况；调整时要进行旋转处理或变色处理，使得新根结点与原根节点相比，路径上 <strong>黑色结点数目不变</strong>。</p>
+<h3 id="情况1-1">情况1</h3>
+<p>被调整结点的兄弟结点为黑色，兄弟结点的两个子结点也为黑色。兄弟结点颜色和被调整结点的颜色都减去一重黑色（黑色变成红色，双重黑变成黑色），父节点加上一重黑色（红色变成黑色，黑色变成双重黑），若双重黑还存在，继续向上调整。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210302172126840.png" /></p>
+<h3 id="情况2-1">情况2</h3>
+<p>兄弟结点为黑色，兄弟节点有红色子节点，位置类似 AVL 树的 RL 关系和 LR 关系，先对兄弟节点进行小右旋或小左旋处理，然后原兄弟节点的颜色变黑，新兄弟节点的颜色变红，转到 情况3 处理。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210303152431326.png" /></p>
+<h3 id="情况3">情况3</h3>
+<p>兄弟结点为黑色，兄弟结点有红色子结点，位置类似 AVL 树的 RR 关系和 LL 关系，先进行大左旋或者右旋，然后新根结点变成原根节点的颜色，其下的两个子结点变成黑色，被调整结点双重黑被消去。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210303153927166.png" /></p>
+<h3 id="情况4">情况4</h3>
+<p>兄弟结点为红色，此时根节点一定为黑色。通过旋转，原根结点变红，原兄弟结点变成新的根节点，颜色变黑，转变成兄弟节点是黑色的情况1、2、3来处理。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210303160113942.png" /></p>
+<h2 id="代码实现">代码实现</h2>
+<p>使用例题来说明：<a target="_blank" rel="noopener" href="http://oj.haizeix.com/problem/64">海贼红黑树</a></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210303195650564.png" /></p>
+<p><strong>样例输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1 1</span><br><span class="line">1 2</span><br><span class="line">1 3</span><br><span class="line">3 0</span><br><span class="line">2 2</span><br><span class="line">3 0</span><br></pre></td></tr></table></figure>
+<p><strong>样例输出</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">1 1 0 0</span><br><span class="line">2 1 1 3</span><br><span class="line">3 1 0 0</span><br><span class="line">1 1 0 3</span><br><span class="line">3 0 0 0</span><br></pre></td></tr></table></figure>
+<p>需要注意 NIL 的使用、颜色判断和颜色结果变化。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br><span class="line">250</span><br><span class="line">251</span><br><span class="line">252</span><br><span class="line">253</span><br><span class="line">254</span><br><span class="line">255</span><br><span class="line">256</span><br><span class="line">257</span><br><span class="line">258</span><br><span class="line">259</span><br><span class="line">260</span><br><span class="line">261</span><br><span class="line">262</span><br><span class="line">263</span><br><span class="line">264</span><br><span class="line">265</span><br><span class="line">266</span><br><span class="line">267</span><br><span class="line">268</span><br><span class="line">269</span><br><span class="line">270</span><br><span class="line">271</span><br><span class="line">272</span><br><span class="line">273</span><br><span class="line">274</span><br><span class="line">275</span><br><span class="line">276</span><br><span class="line">277</span><br><span class="line">278</span><br><span class="line">279</span><br><span class="line">280</span><br><span class="line">281</span><br><span class="line">282</span><br><span class="line">283</span><br><span class="line">284</span><br><span class="line">285</span><br><span class="line">286</span><br><span class="line">287</span><br><span class="line">288</span><br><span class="line">289</span><br><span class="line">290</span><br><span class="line">291</span><br><span class="line">292</span><br><span class="line">293</span><br><span class="line">294</span><br><span class="line">295</span><br><span class="line">296</span><br><span class="line">297</span><br><span class="line">298</span><br><span class="line">299</span><br><span class="line">300</span><br><span class="line">301</span><br><span class="line">302</span><br><span class="line">303</span><br><span class="line">304</span><br><span class="line">305</span><br><span class="line">306</span><br><span class="line">307</span><br><span class="line">308</span><br><span class="line">309</span><br><span class="line">310</span><br><span class="line">311</span><br><span class="line">312</span><br><span class="line">313</span><br><span class="line">314</span><br><span class="line">315</span><br><span class="line">316</span><br><span class="line">317</span><br><span class="line">318</span><br><span class="line">319</span><br><span class="line">320</span><br><span class="line">321</span><br><span class="line">322</span><br><span class="line">323</span><br><span class="line">324</span><br><span class="line">325</span><br><span class="line">326</span><br><span class="line">327</span><br><span class="line">328</span><br><span class="line">329</span><br><span class="line">330</span><br><span class="line">331</span><br><span class="line">332</span><br><span class="line">333</span><br><span class="line">334</span><br><span class="line">335</span><br><span class="line">336</span><br><span class="line">337</span><br><span class="line">338</span><br><span class="line">339</span><br><span class="line">340</span><br><span class="line">341</span><br><span class="line">342</span><br><span class="line">343</span><br><span class="line">344</span><br><span class="line">345</span><br><span class="line">346</span><br><span class="line">347</span><br><span class="line">348</span><br><span class="line">349</span><br><span class="line">350</span><br><span class="line">351</span><br><span class="line">352</span><br><span class="line">353</span><br><span class="line">354</span><br><span class="line">355</span><br><span class="line">356</span><br><span class="line">357</span><br><span class="line">358</span><br><span class="line">359</span><br><span class="line">360</span><br><span class="line">361</span><br><span class="line">362</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 用于可视化输出</span></span><br><span class="line"><span class="comment">// 红黑树 review 作者 xiaocui：1198016164@qq.com</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/ioctl.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;termios.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RED 0</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BLACK 1</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> DBLACK 2</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// #define DEBUG   // 启用 DEBUG 模式检查</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> COLOR_HL(a, b)      <span class="meta-string">&quot;\033[1;&quot;</span> #b <span class="meta-string">&quot;m&quot;</span> a <span class="meta-string">&quot;\033[0m&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> GREEN_HL(a)         COLOR_HL(a, 32)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> RED_HL(a)           COLOR_HL(a, 31)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BLUE_HL(a)          COLOR_HL(a, 34)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> YELLOW_HL(a)        COLOR_HL(a, 33)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> PURPLE_HL(a)        COLOR_HL(a, 35)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BOTTLEGREEN_HL(a)   COLOR_HL(a, 36)</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MOVETO(x,y)         printf(<span class="meta-string">&quot;\033[%d;%dH&quot;</span>, (x), (y)) <span class="comment">// 定位光标</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> CLEAR()             printf(<span class="meta-string">&quot;\033[2J&quot;</span>) <span class="comment">// 清除屏幕</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> &#123;</span></span><br><span class="line">    <span class="keyword">int</span> key;</span><br><span class="line">    <span class="keyword">int</span> color; <span class="comment">// 0 red 1 black 2 double black</span></span><br><span class="line">    <span class="keyword">int</span> h;      <span class="comment">// DEBUG时：添加一个高度用来计算显示的距离</span></span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">Node</span> *<span class="title">lchild</span>, *<span class="title">rchild</span>;</span></span><br><span class="line">&#125; Node;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 叶子结点 NIL</span></span><br><span class="line">Node __NIL;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> NIL (&amp;__NIL)</span></span><br><span class="line"><span class="comment">// 初始化叶子结点</span></span><br><span class="line">__attribute__((constructor)) </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init_NIL</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    NIL-&gt;key = <span class="number">0</span>;</span><br><span class="line">    NIL-&gt;color = BLACK;</span><br><span class="line">    NIL-&gt;lchild = NIL-&gt;rchild = NIL;</span><br><span class="line">    NIL-&gt;h = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">return</span> ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">update_height</span><span class="params">(Node *root)</span> </span>&#123;</span><br><span class="line">    root-&gt;h = ((root-&gt;lchild-&gt;h &gt; root-&gt;rchild-&gt;h) ? (root-&gt;lchild-&gt;h) : (root-&gt;rchild-&gt;h)) + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">Node *<span class="title">getNewNode</span><span class="params">(<span class="keyword">int</span> key)</span> </span>&#123;</span><br><span class="line">    Node *p = (Node *) <span class="built_in">malloc</span>(<span class="keyword">sizeof</span>(Node));</span><br><span class="line">    p-&gt;key = key;</span><br><span class="line">    <span class="comment">// 新结点插入一定为红色</span></span><br><span class="line">    p-&gt;color = RED;</span><br><span class="line">    p-&gt;lchild = p-&gt;rchild = NIL;</span><br><span class="line">    p-&gt;h = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">has_red_child</span><span class="params">(Node *root)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> root-&gt;lchild-&gt;color == RED || root-&gt;rchild-&gt;color == RED;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 左旋</span></span><br><span class="line"><span class="function">Node *<span class="title">left_rotate</span><span class="params">(Node *root)</span> </span>&#123;</span><br><span class="line">    Node *temp = root-&gt;rchild;</span><br><span class="line">    root-&gt;rchild = temp-&gt;lchild;</span><br><span class="line">    temp-&gt;lchild = root;</span><br><span class="line"></span><br><span class="line">    update_height(root);</span><br><span class="line">    update_height(temp);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> temp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 右旋</span></span><br><span class="line"><span class="function">Node *<span class="title">right_rotate</span><span class="params">(Node *root)</span> </span>&#123;</span><br><span class="line">    Node *temp = root-&gt;lchild;</span><br><span class="line">    root-&gt;lchild = temp-&gt;rchild;</span><br><span class="line">    temp-&gt;rchild = root;</span><br><span class="line"></span><br><span class="line">    update_height(root);</span><br><span class="line">    update_height(temp);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> temp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 插入调整</span></span><br><span class="line"><span class="function">Node *<span class="title">insert_maintain</span><span class="params">(Node *root)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!has_red_child(root)) <span class="keyword">return</span> root;</span><br><span class="line">    <span class="keyword">int</span> flag = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 情况1</span></span><br><span class="line">    <span class="keyword">if</span> (root-&gt;lchild-&gt;color == RED &amp;&amp; root-&gt;rchild-&gt;color == RED) &#123;</span><br><span class="line">        <span class="comment">// 出现双红情况调整</span></span><br><span class="line">        <span class="keyword">if</span> (has_red_child(root-&gt;lchild) || has_red_child(root-&gt;rchild)) &#123;</span><br><span class="line">            <span class="keyword">goto</span> insert_end;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 情况2</span></span><br><span class="line">    <span class="comment">// 被调整结点在左边</span></span><br><span class="line">    <span class="keyword">if</span> (root-&gt;lchild-&gt;color == RED &amp;&amp; has_red_child(root-&gt;lchild)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (root-&gt;lchild-&gt;rchild-&gt;color == RED) &#123;</span><br><span class="line">            <span class="comment">// LR 情况</span></span><br><span class="line">            root-&gt;lchild = left_rotate(root-&gt;lchild); </span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// LL 情况</span></span><br><span class="line">        root = right_rotate(root);</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="comment">// 被调整结点在右边</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (root-&gt;rchild-&gt;color == RED &amp;&amp; has_red_child(root-&gt;rchild)) &#123;</span><br><span class="line">        <span class="keyword">if</span> (root-&gt;rchild-&gt;lchild-&gt;color == RED) &#123;</span><br><span class="line">            <span class="comment">// RL 情况</span></span><br><span class="line">            root-&gt;rchild = right_rotate(root-&gt;rchild);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// RR 情况</span></span><br><span class="line">        root = left_rotate(root);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 上浮策略</span></span><br><span class="line">insert_end:</span><br><span class="line">    root-&gt;color = RED;</span><br><span class="line">    root-&gt;lchild-&gt;color = root-&gt;rchild-&gt;color = BLACK;</span><br><span class="line">    <span class="comment">// 若还存在双红情况向上传递</span></span><br><span class="line">    <span class="keyword">return</span> root;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Node *__insert(Node *root, <span class="keyword">int</span> key) &#123;</span><br><span class="line">    <span class="keyword">if</span> (root == NIL) <span class="keyword">return</span> getNewNode(key);</span><br><span class="line">    <span class="keyword">if</span> (root-&gt;key == key) <span class="keyword">return</span> root;</span><br><span class="line">    <span class="keyword">if</span> (key &lt; root-&gt;key) &#123;</span><br><span class="line">        root-&gt;lchild = __insert(root-&gt;lchild, key);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        root-&gt;rchild = __insert(root-&gt;rchild, key);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 插入完后调整</span></span><br><span class="line">    root = insert_maintain(root);</span><br><span class="line">    update_height(root);</span><br><span class="line">    <span class="keyword">return</span> root;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调整后根结点默认为黑色</span></span><br><span class="line"><span class="function">Node *<span class="title">insert</span><span class="params">(Node *root, <span class="keyword">int</span> key)</span> </span>&#123;</span><br><span class="line">    root = __insert(root, key);</span><br><span class="line">    root-&gt;color = BLACK;</span><br><span class="line">    <span class="keyword">return</span> root;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 获得前驱结点</span></span><br><span class="line"><span class="function">Node *<span class="title">precessor</span><span class="params">(Node *root)</span> </span>&#123;</span><br><span class="line">    Node *temp = root-&gt;lchild;</span><br><span class="line">    <span class="keyword">while</span> (temp-&gt;rchild != NIL) temp = temp-&gt;rchild;</span><br><span class="line">    <span class="keyword">return</span> temp;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">Node *<span class="title">erase_maintain</span><span class="params">(Node *root)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 不存在双重黑结点，不需要调整</span></span><br><span class="line">    <span class="keyword">if</span> (root-&gt;lchild-&gt;color != DBLACK &amp;&amp; root-&gt;rchild-&gt;color != DBLACK) <span class="keyword">return</span> root;</span><br><span class="line">    <span class="comment">// 情况4</span></span><br><span class="line">    <span class="keyword">if</span> (has_red_child(root)) &#123;</span><br><span class="line">        <span class="keyword">int</span> flag = <span class="number">0</span>;</span><br><span class="line">        <span class="comment">// 原根节点变红</span></span><br><span class="line">        root-&gt;color = RED;</span><br><span class="line">        <span class="comment">// LL 情况</span></span><br><span class="line">        <span class="keyword">if</span> (root-&gt;lchild-&gt;color == RED) &#123;</span><br><span class="line">            root = right_rotate(root);</span><br><span class="line">            flag = <span class="number">1</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="comment">// RR 情况</span></span><br><span class="line">            root = left_rotate(root);</span><br><span class="line">            flag = <span class="number">2</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 原红色兄弟结点称为新根结点，变黑色</span></span><br><span class="line">        root-&gt;color = BLACK;</span><br><span class="line">        <span class="comment">// 到原根结点去调整，转为情况1、2、3</span></span><br><span class="line">        <span class="keyword">if</span> (flag == <span class="number">1</span>) &#123;</span><br><span class="line">            root-&gt;rchild = erase_maintain(root-&gt;rchild);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            root-&gt;lchild = erase_maintain(root-&gt;lchild);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 若还存在双重黑向上传递</span></span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 情况1</span></span><br><span class="line">    <span class="keyword">if</span> ((root-&gt;lchild-&gt;color == DBLACK &amp;&amp; !has_red_child(root-&gt;rchild)) || </span><br><span class="line">        (root-&gt;rchild-&gt;color == DBLACK &amp;&amp; !has_red_child(root-&gt;lchild))) &#123;</span><br><span class="line">        root-&gt;lchild-&gt;color -= BLACK;</span><br><span class="line">        root-&gt;rchild-&gt;color -= BLACK;</span><br><span class="line">        root-&gt;color += BLACK;</span><br><span class="line">        <span class="keyword">return</span> root;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (root-&gt;lchild-&gt;color == DBLACK) &#123;</span><br><span class="line">        <span class="comment">// 编码问题：由于可能再指向的是 NIL 结点</span></span><br><span class="line">        <span class="comment">// 此处代码效果逻辑上等同于 RL 情况</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 到情况3 时肯定会先减去一重黑色</span></span><br><span class="line">        root-&gt;lchild-&gt;color -= BLACK;</span><br><span class="line">        <span class="keyword">if</span> (root-&gt;rchild-&gt;rchild-&gt;color != RED) &#123;</span><br><span class="line">            <span class="comment">// 情况2 RL 情况</span></span><br><span class="line">            <span class="comment">// 变色过程和旋转</span></span><br><span class="line">            root-&gt;rchild-&gt;color = RED;</span><br><span class="line">            root-&gt;rchild = right_rotate(root-&gt;rchild);</span><br><span class="line">            root-&gt;rchild-&gt;color = BLACK;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 情况3 RR 情况</span></span><br><span class="line">        root = left_rotate(root);</span><br><span class="line">        <span class="comment">// 新根结点的颜色变成原根结点的颜色</span></span><br><span class="line">        root-&gt;color = root-&gt;lchild-&gt;color;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        root-&gt;rchild-&gt;color -= BLACK;</span><br><span class="line">        <span class="keyword">if</span> (root-&gt;lchild-&gt;lchild-&gt;color != RED) &#123;</span><br><span class="line">            root-&gt;lchild-&gt;color = RED;</span><br><span class="line">            root-&gt;lchild = left_rotate(root-&gt;lchild);</span><br><span class="line">            root-&gt;lchild-&gt;color = BLACK;</span><br><span class="line">        &#125;</span><br><span class="line">        root = right_rotate(root);</span><br><span class="line">        root-&gt;color = root-&gt;rchild-&gt;color;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 情况3 新根结点的两个子节点变成黑色，双重黑被消除</span></span><br><span class="line">    root-&gt;lchild-&gt;color = root-&gt;rchild-&gt;color = BLACK;</span><br><span class="line">    <span class="keyword">return</span> root;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">Node *__erase(Node *root, <span class="keyword">int</span> key) &#123;</span><br><span class="line">    <span class="keyword">if</span> (root == NIL) <span class="keyword">return</span> NIL;</span><br><span class="line">    <span class="keyword">if</span> (key &lt; root-&gt;key) &#123;</span><br><span class="line">        root-&gt;lchild = __erase(root-&gt;lchild, key);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (key &gt; root-&gt;key) &#123;</span><br><span class="line">        root-&gt;rchild = __erase(root-&gt;rchild, key);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (root-&gt;lchild == NIL || root-&gt;rchild == NIL) &#123;</span><br><span class="line">        <span class="comment">// 如果没有子结点为红色不影响</span></span><br><span class="line">        <span class="comment">// 如果没有子结点黑色，删除后 NIL 结点本身被视为双重黑结点也可再回溯调整</span></span><br><span class="line">        <span class="comment">// 如果有 1 个子结点，该结点一定为黑色，子结点为红色，该结点用子结点替代，颜色变成黑色</span></span><br><span class="line">        <span class="comment">// 实际以上逻辑可以共享此处代码</span></span><br><span class="line">        Node *temp = root-&gt;lchild != NIL ? root-&gt;lchild : root-&gt;rchild;</span><br><span class="line">        temp-&gt;color += root-&gt;color;</span><br><span class="line">        <span class="built_in">free</span>(root);</span><br><span class="line">        <span class="keyword">return</span> temp;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">// 如果有两个子结点，视为删掉前驱结点后，再调整</span></span><br><span class="line">        Node *temp = precessor(root);</span><br><span class="line">        root-&gt;key = temp-&gt;key;</span><br><span class="line">        root-&gt;lchild = __erase(root-&gt;lchild, temp-&gt;key);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 回溯调整</span></span><br><span class="line">    root = erase_maintain(root);</span><br><span class="line">    update_height(root);</span><br><span class="line">    <span class="keyword">return</span> root;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 调整后根结点默认为黑色</span></span><br><span class="line"><span class="function">Node *<span class="title">erase</span><span class="params">(Node *root, <span class="keyword">int</span> key)</span> </span>&#123;</span><br><span class="line">    root = __erase(root, key);</span><br><span class="line">    root-&gt;color = BLACK;</span><br><span class="line">    <span class="keyword">return</span> root;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">clear</span><span class="params">(Node *root)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (root == NIL) <span class="keyword">return</span> ;</span><br><span class="line">    clear(root-&gt;lchild);</span><br><span class="line">    clear(root-&gt;rchild);</span><br><span class="line">    <span class="built_in">free</span>(root);</span><br><span class="line">    <span class="keyword">return</span> ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 打印红黑树结构</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">print</span><span class="params">(Node *root)</span> </span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d %d %d %d\n&quot;</span>, </span><br><span class="line">          root-&gt;key, root-&gt;color,</span><br><span class="line">          root-&gt;lchild-&gt;key, </span><br><span class="line">          root-&gt;rchild-&gt;key</span><br><span class="line">    );</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">ifndef</span> DEBUG</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">output</span><span class="params">(Node *root)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (root == NIL) <span class="keyword">return</span> ;</span><br><span class="line">    output(root-&gt;lchild);</span><br><span class="line">    print(root);</span><br><span class="line">    output(root-&gt;rchild);</span><br><span class="line">    <span class="keyword">return</span> ;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">winsize</span> <span class="title">size</span>;</span></span><br><span class="line">__attribute__((constructor)) </span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">init_WINSIZE</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    ioctl(STDOUT_FILENO, TIOCGWINSZ, &amp;size);</span><br><span class="line">    <span class="keyword">return</span> ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">my_print</span><span class="params">(<span class="keyword">int</span> flag, <span class="keyword">int</span> bit, <span class="keyword">int</span> dis, <span class="keyword">int</span> x, <span class="keyword">int</span> y, Node *root)</span> </span>&#123;</span><br><span class="line">    MOVETO(y, x);</span><br><span class="line">    <span class="keyword">if</span> (root-&gt;color == BLACK) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, root-&gt;key);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="built_in">printf</span>(RED_HL(<span class="string">&quot;%-*d\n&quot;</span>), bit / <span class="number">2</span>, root-&gt;key);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (flag == <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= dis; i++) &#123;</span><br><span class="line">            MOVETO(y - i, x + i * <span class="number">2</span> - <span class="number">1</span>);</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;/\n&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (flag == <span class="number">2</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= dis; i++) &#123;</span><br><span class="line">            MOVETO(y - i, x - i * <span class="number">2</span> + <span class="number">1</span>);</span><br><span class="line">            <span class="built_in">printf</span>(<span class="string">&quot;\\\n&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">my_output</span><span class="params">(<span class="keyword">int</span> flag, <span class="keyword">int</span> bit, <span class="keyword">int</span> dis, <span class="keyword">int</span> x, <span class="keyword">int</span> y, Node *root)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (root == NIL) <span class="keyword">return</span> ;</span><br><span class="line">    my_print(flag, bit, dis, x, y, root);</span><br><span class="line">    my_output(<span class="number">1</span>, bit, dis / <span class="number">2</span>, x - dis - bit, y + dis / <span class="number">2</span> + <span class="number">1</span>, root-&gt;lchild);</span><br><span class="line">    my_output(<span class="number">2</span>, bit, dis / <span class="number">2</span>, x + dis + bit, y + dis / <span class="number">2</span> + <span class="number">1</span>, root-&gt;rchild);</span><br><span class="line">    <span class="keyword">return</span> ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">getMaxwidth</span><span class="params">(Node *root)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (root == NIL) <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (root-&gt;rchild != NIL) root = root-&gt;rchild;</span><br><span class="line">    <span class="keyword">int</span> maxvalue = root-&gt;key;</span><br><span class="line">    <span class="keyword">int</span> bit = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (maxvalue) &#123;</span><br><span class="line">        bit++;</span><br><span class="line">        maxvalue /= <span class="number">10</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> bit;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">output</span><span class="params">(Node *root)</span> </span>&#123;</span><br><span class="line">    CLEAR();</span><br><span class="line">    <span class="keyword">int</span> bit = getMaxwidth(root);</span><br><span class="line">    my_output(<span class="number">0</span>, bit, <span class="built_in">pow</span>(<span class="number">2</span>, root-&gt;h - <span class="number">1</span>), size.ws_col / <span class="number">2</span>, <span class="number">1</span>, root);</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> op, val;</span><br><span class="line">    Node *root = NIL;</span><br><span class="line">    <span class="keyword">while</span> (~<span class="built_in">scanf</span>(<span class="string">&quot;%d%d&quot;</span>, &amp;op, &amp;val)) &#123;</span><br><span class="line">        <span class="keyword">switch</span> (op) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">                root = insert(root, val);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">                root = erase(root, val);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">                output(root);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    clear(root);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/blog/tags/OJ/" rel="tag"># OJ</a>
+              <a href="/blog/tags/haizeiOJ/" rel="tag"># haizeiOJ</a>
+              <a href="/blog/tags/%E4%BA%8C%E5%8F%89%E6%A0%91/" rel="tag"># 二叉树</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/03/03/OJ-luogu-1991/" rel="prev" title="OJ-luogu-1991">
+                  <i class="fa fa-chevron-left"></i> OJ-luogu-1991
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/03/03/OJ-luogu-2820/" rel="next" title="OJ-luogu-2820">
+                  OJ-luogu-2820 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hauk</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/blog/js/utils.js"></script><script src="/blog/js/motion.js"></script><script src="/blog/js/schemes/muse.js"></script><script src="/blog/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'none'
+      },
+      options: {
+        renderActions: {
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/tex-mml-chtml.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.typesetClear();
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+
+
+</body>
+</html>
