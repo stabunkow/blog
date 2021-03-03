@@ -1,5 +1,5 @@
 ---
-title: OJ-morris遍历
+title: morris遍历
 date: 2021-03-01 14:25:41
 tag: [OJ, 二叉树]
 mathjax: true
