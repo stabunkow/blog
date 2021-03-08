@@ -7,7 +7,7 @@ tag: [OJ, haizeiOJ, 拓扑排序]
 
 # [排序](http://oj.haizeix.com/problem/637)
 
-![image-20210304212400425](https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210304212400425.png)
+![](https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210304212400425.png)
 
 **样例输入1**
 
