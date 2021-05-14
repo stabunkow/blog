@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"stabunkow.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","version":"8.2.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="假设检验 在 相关性分析、回归分析 等问题中，需要对数据的分布做出合理假设，认为其符合某种分布，这样分析才有意义。 在原假设成立的情况下，数据需要满足 某一分布，p 值为当原假设为真时，比所得到的样本观察结果更极端的结果出现的概率。原假设 \(H_0\) 成立时的最低显著性水平为 \(\alpha\) ， 若 p 值大于 \(\alpha\) ，接受原假设，\(1 - \alpha\) 即为置信水">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数学建模-数模基础">
+<meta property="og:url" content="http://stabunkow.github.io/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E6%95%B0%E6%A8%A1%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="Hauk&#39;s Blog">
+<meta property="og:description" content="假设检验 在 相关性分析、回归分析 等问题中，需要对数据的分布做出合理假设，认为其符合某种分布，这样分析才有意义。 在原假设成立的情况下，数据需要满足 某一分布，p 值为当原假设为真时，比所得到的样本观察结果更极端的结果出现的概率。原假设 \(H_0\) 成立时的最低显著性水平为 \(\alpha\) ， 若 p 值大于 \(\alpha\) ，接受原假设，\(1 - \alpha\) 即为置信水">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422141019850.png">
+<meta property="og:image" content="https://img-blog.csdn.net/20180624110938247?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3RpYW5ndWl5dXl1/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422141259974.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422141941592.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422142902242.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421200940453.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421201009807.png">
+<meta property="article:published_time" content="2021-05-14T12:01:02.000Z">
+<meta property="article:modified_time" content="2021-05-14T13:33:49.329Z">
+<meta property="article:author" content="Hauk">
+<meta property="article:tag" content="数学建模">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422141019850.png">
+
+
+<link rel="canonical" href="http://stabunkow.github.io/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E6%95%B0%E6%A8%A1%E5%9F%BA%E7%A1%80/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>数学建模-数模基础 | Hauk's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hauk's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">~ o ha yo ~</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%81%87%E8%AE%BE%E6%A3%80%E9%AA%8C"><span class="nav-number">1.</span> <span class="nav-text">假设检验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4"><span class="nav-number">1.1.</span> <span class="nav-text">步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9D%87%E5%80%BC%E6%A3%80%E9%AA%8C"><span class="nav-number">1.2.</span> <span class="nav-text">均值检验</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BE%8B%E9%A2%98"><span class="nav-number">1.2.1.</span> <span class="nav-text">例题</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E5%B8%83%E6%A3%80%E9%AA%8C"><span class="nav-number">1.3.</span> <span class="nav-text">分布检验</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8F%8F%E8%BF%B0%E7%BB%9F%E8%AE%A1"><span class="nav-number">2.</span> <span class="nav-text">描述统计</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#excel"><span class="nav-number">2.1.</span> <span class="nav-text">Excel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#matlab"><span class="nav-number">2.2.</span> <span class="nav-text">Matlab</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spss"><span class="nav-number">2.3.</span> <span class="nav-text">SPSS</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#matlab-%E4%BD%BF%E7%94%A8"><span class="nav-number">3.</span> <span class="nav-text">Matlab 使用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E6%97%B6%E8%84%9A%E6%9C%AC%E8%BF%90%E8%A1%8C"><span class="nav-number">3.1.</span> <span class="nav-text">实时脚本运行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E7%BB%B4%E7%BB%98%E5%9B%BE"><span class="nav-number">3.2.</span> <span class="nav-text">三维绘图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%AC%A6%E5%8F%B7%E8%BF%90%E7%AE%97"><span class="nav-number">3.3.</span> <span class="nav-text">符号运算</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Hauk</p>
+  <div class="site-description" itemprop="description">Try to write something.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/blog/archives">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://stabunkow.github.io/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E6%95%B0%E6%A8%A1%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="Hauk">
+      <meta itemprop="description" content="Try to write something.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hauk's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数学建模-数模基础
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-05-14 20:01:02 / 修改时间：21:33:49" itemprop="dateCreated datePublished" datetime="2021-05-14T20:01:02+08:00">2021-05-14</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="假设检验">假设检验</h1>
+<p>在 <em>相关性分析</em>、<em>回归分析</em> 等问题中，需要对数据的分布做出合理假设，认为其符合某种分布，这样分析才有意义。</p>
+<p>在原假设成立的情况下，数据需要满足 <strong>某一分布</strong>，p 值为当原假设为真时，比所得到的样本观察结果更极端的结果出现的概率。原假设 <span class="math inline">\(H_0\)</span> 成立时的最低显著性水平为 <span class="math inline">\(\alpha\)</span> ， 若 p 值大于 <span class="math inline">\(\alpha\)</span> ，接受原假设，<span class="math inline">\(1 - \alpha\)</span> 即为置信水平。</p>
+<h2 id="步骤">步骤</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422141019850.png" /></p>
+<h2 id="均值检验">均值检验</h2>
+<p>在已知样本服从正态分布的情况下，比较两个平均数的差异是否显著，从而承认或拒绝原假设。</p>
+<p><img src="https://img-blog.csdn.net/20180624110938247?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3RpYW5ndWl5dXl1/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70" /></p>
+<p><em>Z 检验</em> 的核心是总体服从正态分布，且该正态分布的均值未知，需要我们检验，但 <strong>方差</strong> 已知。</p>
+<p>然而，在 <strong>现实问题</strong> 中，总体的方差也往往是未知的，如果总体方差未知，可以通过引入样本方差，来进行 <em>t 检验</em>。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422141259974.png" /></p>
+<h3 id="例题">例题</h3>
+<p>为了比较两种产品、两种仪器、两种方法等的 <strong>差异</strong>，我们常在 <strong>相同</strong> 的条件下做对比试验，得到一批成对的观察值，然后分析观察数据作出推断，这种方法常称为逐对比较法。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422141941592.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422142902242.png" /></p>
+<h2 id="分布检验">分布检验</h2>
+<p>不能知道总体服从什么类型的分布，这时就需要根据样本来检验关于分布的假设，使用 <em>卡方拟合检验法</em>，它可以用来检验总体是否具有某一个指定的分布或属于某一个分布族。</p>
+<h1 id="描述统计">描述统计</h1>
+<h2 id="excel">Excel</h2>
+<p>F4 技巧，函数，数据透视表。</p>
+<p>饼图、柱状图、条形图、直方图、折线图、散点图、箱线图的绘画使用。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421200940453.png" /></p>
+<h2 id="matlab">Matlab</h2>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">MIN = <span class="built_in">min</span>(Test); <span class="comment">% 每一列的最小值</span></span><br><span class="line">MAX = <span class="built_in">max</span>(Test); <span class="comment">% 每一列的最大值</span></span><br><span class="line">MEAN = <span class="built_in">mean</span>(Test); <span class="comment">% 每一列的均值</span></span><br><span class="line">MEDIAN = median(Test); <span class="comment">%每一列的中位数</span></span><br><span class="line">SKEWNESS = skewness(Test); <span class="comment">%每一列的偏度</span></span><br><span class="line">KURTOSIS = kurtosis(Test);  <span class="comment">%每一列的峰度</span></span><br><span class="line">STD = std(Test);  <span class="comment">% 每一列的标准差</span></span><br><span class="line">RESULT = [MIN;MAX;MEAN;MEDIAN;SKEWNESS;KURTOSIS;STD]</span><br></pre></td></tr></table></figure>
+<h2 id="spss">SPSS</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421201009807.png" /></p>
+<h1 id="matlab-使用">Matlab 使用</h1>
+<h2 id="实时脚本运行">实时脚本运行</h2>
+<p>可以美化公式。</p>
+<h2 id="三维绘图">三维绘图</h2>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line">X = [<span class="number">1</span> <span class="number">2</span> <span class="number">4</span>];</span><br><span class="line">Y = [<span class="number">3</span> <span class="number">5</span>];</span><br><span class="line">Z = [<span class="number">4</span> <span class="number">8</span> <span class="number">10</span>; <span class="number">5</span> <span class="number">9</span> <span class="number">13</span>] <span class="comment">% n * m</span></span><br><span class="line">mesh(X, Y, Z) <span class="comment">% 也可以一一对应</span></span><br><span class="line">xlabel(<span class="string">&#x27;x轴&#x27;</span>)  </span><br><span class="line">ylabel(<span class="string">&#x27;y轴&#x27;</span>)  </span><br><span class="line">zlabel(<span class="string">&#x27;z轴&#x27;</span>)</span><br><span class="line"></span><br><span class="line">mesh(Z) <span class="comment">% 单纯绘图 X 1:3 Y 1:2</span></span><br><span class="line">hidden off <span class="comment">%% 取消遮挡</span></span><br><span class="line"></span><br><span class="line"><span class="comment">%% 以 mesh 低密度形成曲线</span></span><br><span class="line">n = <span class="number">11</span>;</span><br><span class="line">tem = <span class="built_in">linspace</span>(<span class="number">0</span>, <span class="number">5</span>, n); <span class="comment">% 0-5 等距分隔成 n 份</span></span><br><span class="line">x = <span class="built_in">repmat</span>(tem, n, <span class="number">1</span>);</span><br><span class="line">y = <span class="built_in">repmat</span>(tem, n, <span class="number">1</span>);</span><br><span class="line">z = x .^ <span class="number">2</span> - y .^ <span class="number">2</span>;</span><br><span class="line">mesh(x, y, z)</span><br><span class="line">axis vis3d</span><br><span class="line"></span><br><span class="line">[x, y] = <span class="built_in">meshgrid</span>(<span class="number">-5</span>:<span class="number">0.5</span>:<span class="number">5</span>); <span class="comment">% 限制区域</span></span><br><span class="line">tem = <span class="built_in">sqrt</span>(x .^ <span class="number">2</span> + y .^ <span class="number">2</span> + <span class="number">1e-12</span>); <span class="comment">% eps 也可以，防止 0/0 = NaN</span></span><br><span class="line">z = <span class="built_in">sin</span>(tem) ./ tem;</span><br><span class="line">mesh(x, y, z)</span><br><span class="line">axis vis3d</span><br><span class="line"></span><br><span class="line"><span class="comment">% meshc 同时绘制等高线</span></span><br><span class="line"><span class="comment">% meshz 加底柱</span></span><br><span class="line"><span class="comment">% surf 绘制面</span></span><br><span class="line">[x, y] = <span class="built_in">meshgrid</span>(linespace(<span class="number">0</span>, <span class="number">5</span>, <span class="number">11</span>));</span><br><span class="line">z = x .^ <span class="number">2</span> - y .^ <span class="number">2</span>;</span><br><span class="line">subplot(<span class="number">1</span>, <span class="number">2</span>, <span class="number">1</span>)</span><br><span class="line">mesh(x, y, z)</span><br><span class="line">title(<span class="string">&#x27;mesh&#x27;</span>)</span><br><span class="line">axis vis3d</span><br><span class="line"></span><br><span class="line">subplot(<span class="number">1</span>, <span class="number">2</span>, <span class="number">1</span>)</span><br><span class="line">surf(x, y, z)</span><br><span class="line">title(<span class="string">&#x27;surf&#x27;</span>)</span><br><span class="line">axis vis3d</span><br><span class="line"><span class="comment">% surfl 加灯光</span></span><br><span class="line"><span class="comment">% shading flat/interp 光滑模式</span></span><br><span class="line"></span><br><span class="line">[x, y] = <span class="built_in">meshgrid</span>(<span class="number">-3</span>:<span class="number">0.1</span>:<span class="number">3</span>);</span><br><span class="line">peaks</span><br><span class="line">maxz = <span class="built_in">max</span>(<span class="built_in">max</span>(z));</span><br><span class="line">minz = <span class="built_in">min</span>(<span class="built_in">min</span>(z));</span><br><span class="line">levels = <span class="built_in">linspace</span>(minz, maxz, <span class="number">5</span>); <span class="comment">% levels 为数值也可以</span></span><br><span class="line">contour(x, y, z, levels, <span class="string">&#x27;--&#x27;</span>, <span class="string">&#x27;LineWidth&#x27;</span>, <span class="number">2</span>, <span class="string">&#x27;ShowText&#x27;</span>, <span class="string">&#x27;on&#x27;</span>)</span><br><span class="line"><span class="comment">% contourf contour3</span></span><br><span class="line"></span><br><span class="line"><span class="comment">%% plot3 三位空间折线图</span></span><br><span class="line">t = linespace(<span class="number">0</span>, <span class="number">4</span> * <span class="built_in">pi</span>, <span class="number">100</span>);</span><br><span class="line">x = <span class="built_in">sin</span>(t) + <span class="number">1</span>;</span><br><span class="line">y = <span class="built_in">cos</span>(t);</span><br><span class="line">z = t;</span><br><span class="line"><span class="built_in">plot3</span>(x, y, z);</span><br><span class="line"></span><br><span class="line"><span class="comment">% 符号函数</span></span><br><span class="line">syms u v</span><br><span class="line">r = <span class="number">2</span> + <span class="built_in">sin</span>(<span class="number">7</span> .* u + <span class="number">5</span> .* v);</span><br><span class="line">x = r .* <span class="built_in">cos</span>(u) .* <span class="built_in">sin</span>(v);</span><br><span class="line">y = r .* <span class="built_in">sin</span>(u) .* <span class="built_in">sin</span>(v);</span><br><span class="line">z = r .* <span class="built_in">cos</span>(v);</span><br><span class="line">fmesh(x, y, z, [<span class="number">0</span> <span class="number">2</span> * <span class="built_in">pi</span> <span class="number">0</span> <span class="built_in">pi</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment">% 隐函数绘制</span></span><br><span class="line">f = @(x, y, z) x .^ <span class="number">2</span> + y .^ <span class="number">2</span> - z .^ <span class="number">2</span>; <span class="comment">% == 0</span></span><br><span class="line">fimplicit(f);</span><br></pre></td></tr></table></figure>
+<h2 id="符号运算">符号运算</h2>
+<p>不定积分、定积分求解，方程组求解。</p>
+<p><figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">% 符号表达式可以化解、因式分解</span></span><br><span class="line">y = m ^ <span class="number">2</span> - n ^ <span class="number">2</span>;</span><br><span class="line">simplify(y)</span><br><span class="line"><span class="built_in">factor</span>(y)</span><br><span class="line">expand(y) <span class="comment">% 多项式展开</span></span><br><span class="line">collect(y) <span class="comment">% 多项式合并</span></span><br><span class="line">[z1, z2] = numden(sym(<span class="number">2.5</span>)) <span class="comment">% 计算分子和分母</span></span><br><span class="line">mupad <span class="comment">% 符号运算工具箱</span></span><br><span class="line"></span><br><span class="line">syms x</span><br><span class="line">y = x ^ <span class="number">4</span> - <span class="number">5</span> * x ^ <span class="number">2</span> + <span class="number">6</span></span><br><span class="line">diff(y) <span class="comment">% 求一阶导</span></span><br><span class="line">diff(y, <span class="number">2</span>) <span class="comment">% 求二阶导</span></span><br><span class="line"><span class="comment">% 注意对矩阵 diff 是求差分</span></span><br><span class="line"></span><br><span class="line">y = <span class="built_in">cos</span>(x) * <span class="built_in">tan</span>(x)</span><br><span class="line">dy = diff(y, <span class="number">10</span>)</span><br><span class="line">simplify(dy)</span><br><span class="line"></span><br><span class="line">syms x1 x2 x3</span><br><span class="line">y1 = x1^<span class="number">5</span>*x2+x2*x3-x1^<span class="number">2</span>*x3</span><br><span class="line">py1 = diff(y1,x1,<span class="number">1</span>) <span class="comment">% 对x1求一阶偏导</span></span><br><span class="line">py2 = diff(y1,x1,x2) <span class="comment">% 先对x1求偏导，再对x2求偏导</span></span><br><span class="line"></span><br><span class="line"><span class="comment">% 不定积分 不会加上常数和绝对值</span></span><br><span class="line">syms x</span><br><span class="line">y = x ^ <span class="number">2</span></span><br><span class="line">int(y, x)</span><br><span class="line">syms x</span><br><span class="line">y = <span class="number">1</span>/x</span><br><span class="line">int(y, x)</span><br><span class="line"></span><br><span class="line"><span class="comment">% 定积分 不是所有函数都能推出积分</span></span><br><span class="line">syms x</span><br><span class="line">y = <span class="built_in">sin</span>(x)</span><br><span class="line">int(y, x, <span class="number">0</span>, <span class="built_in">pi</span> / <span class="number">2</span>)</span><br><span class="line">syms x a b</span><br><span class="line">y = <span class="built_in">exp</span>(x)</span><br><span class="line">int(y, x, a, b)</span><br><span class="line"></span><br><span class="line">y = <span class="number">1</span> / <span class="built_in">exp</span>(x) * <span class="built_in">log</span>(x+<span class="number">2</span>*x^<span class="number">2</span>+<span class="built_in">sin</span>(x)) <span class="comment">% 无法求出积分</span></span><br><span class="line">int(y,x,<span class="number">0</span>,<span class="number">4</span>)</span><br><span class="line"><span class="comment">% 我们可以计算数值积分：数值积分可用于求定积分的近似值</span></span><br><span class="line">syms x </span><br><span class="line">y = @(x) <span class="number">1</span> ./ <span class="built_in">exp</span>(x) .* <span class="built_in">log</span>(x+<span class="number">2.</span>*x.^<span class="number">2</span>+<span class="built_in">sin</span>(x))  <span class="comment">% 注意，写成函数句柄时，要用点乘或者点除</span></span><br><span class="line">integral(y,<span class="number">0</span>,<span class="number">4</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">%% 例题1: 求解单变量方程</span></span><br><span class="line">syms x</span><br><span class="line">answ = solve(<span class="built_in">sin</span>(x) == <span class="number">1</span>, x)</span><br><span class="line">eqn = (<span class="built_in">sin</span>(x) == <span class="number">1</span>)</span><br><span class="line"><span class="comment">% 因为三角函数是周期函数，如果要得到所有的解，则需要加上条件</span></span><br><span class="line">[answ, params, condions] = solve(eqn, x, <span class="string">&#x27;ReturnConditions&#x27;</span>, <span class="built_in">true</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">%% 例题2: 多变量方程求解</span></span><br><span class="line">syms a b c x</span><br><span class="line">eqn = (a*x^<span class="number">2</span> + b*x + c == <span class="number">0</span>);</span><br><span class="line">answ1 = solve(eqn, x)  <span class="comment">% 将x视为未知数求解 </span></span><br><span class="line">answ2 = solve(eqn, a) <span class="comment">% 将a视为未知数求解</span></span><br><span class="line"></span><br><span class="line"><span class="comment">%% 例题3：方程组求解</span></span><br><span class="line">syms u v a</span><br><span class="line">eqn = [<span class="number">2</span>*u + v == a, u - v == <span class="number">1</span>];</span><br><span class="line">answ = solve(eqn, [u, v])</span><br><span class="line">answ.u</span><br><span class="line">answ.v</span><br><span class="line">[answ_u, answ_v] = solve(eqn, [u, v])</span><br><span class="line"></span><br><span class="line"><span class="comment">%% solve 可能会警告</span></span><br><span class="line">syms x</span><br><span class="line">eqn = (<span class="built_in">sin</span>(x) == x^<span class="number">2</span> - <span class="number">1</span>);</span><br><span class="line">solve(eqn, x)  <span class="comment">% 警告</span></span><br><span class="line"><span class="comment">% 画图看看 </span></span><br><span class="line">fplot(<span class="built_in">sin</span>(x), [<span class="number">-2</span> <span class="number">2</span>])  <span class="comment">% fplot函数可绘制表达式的图形</span></span><br><span class="line"><span class="built_in">hold</span> on</span><br><span class="line">fplot(x^<span class="number">2</span> - <span class="number">1</span>, [<span class="number">-2</span> <span class="number">2</span>]) </span><br><span class="line"></span><br><span class="line"><span class="comment">%% vpasolve函数求解，可以指定区间</span></span><br><span class="line">syms x</span><br><span class="line">eqn = <span class="built_in">sin</span>(x) == x^<span class="number">2</span> - <span class="number">1</span>;</span><br><span class="line">vpasolve(eqn, x, [<span class="number">0</span> <span class="number">2</span>])</span><br><span class="line">vpasolve(eqn, x, [<span class="number">-1</span> <span class="number">0</span>])</span><br><span class="line">vpasolve(eqn, x, [<span class="number">-10</span> <span class="number">10</span>])</span><br><span class="line">vpasolve(eqn, x, <span class="string">&#x27;random&#x27;</span>, <span class="built_in">true</span>) </span><br><span class="line">vpasolve(eqn, x, <span class="number">-5</span>)   <span class="comment">% 给定搜索的起始点</span></span><br><span class="line"></span><br><span class="line">syms x y</span><br><span class="line">eqn = [x^<span class="number">2</span> - <span class="number">2</span>*x - <span class="number">3</span>*x*y == <span class="number">10</span>, y^<span class="number">4</span> == <span class="built_in">exp</span>(<span class="number">-2</span>*x/<span class="number">3</span>*y)]</span><br><span class="line">fimplicit(x^<span class="number">2</span> - <span class="number">2</span>*x - <span class="number">3</span>*x*y == <span class="number">10</span>, [<span class="number">-10</span> <span class="number">10</span>],<span class="string">&#x27;r&#x27;</span>)</span><br><span class="line"><span class="built_in">hold</span> on</span><br><span class="line">fimplicit(y^<span class="number">4</span> == <span class="built_in">exp</span>(<span class="number">-2</span>*x/<span class="number">3</span>*y), [<span class="number">-10</span> <span class="number">10</span>],<span class="string">&#x27;b&#x27;</span>)</span><br><span class="line">[answ_x, answ_y] = vpasolve(eqn, [x, y],[<span class="number">-4</span> <span class="number">-1</span>;<span class="number">1</span> <span class="number">5</span>])</span><br><span class="line"><span class="built_in">hold</span> on</span><br><span class="line"><span class="comment">% 符号变量变回数值变量</span></span><br><span class="line"><span class="built_in">plot</span>(double(answ_x), double(answ_y), <span class="string">&#x27;ko&#x27;</span>, <span class="string">&#x27;MarkerSize&#x27;</span>, <span class="number">10</span>) </span><br><span class="line"></span><br><span class="line"><span class="comment">% 默认工具箱求解</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">F</span> = <span class="title">my_fun</span><span class="params">(x)</span></span></span><br><span class="line">    F(<span class="number">1</span>) = <span class="built_in">exp</span>(-<span class="built_in">exp</span>(-(x(<span class="number">1</span>)+x(<span class="number">2</span>)))) - x(<span class="number">2</span>)*(<span class="number">1</span>+x(<span class="number">1</span>)^<span class="number">2</span>);</span><br><span class="line">    F(<span class="number">2</span>) = x(<span class="number">1</span>)*<span class="built_in">cos</span>(x(<span class="number">2</span>)) + x(<span class="number">2</span>)*<span class="built_in">sin</span>(x(<span class="number">1</span>)) - <span class="number">0.5</span>;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line">x0 = [<span class="number">0</span>,<span class="number">0</span>];  <span class="comment">% 初始值</span></span><br><span class="line">result_x = fsolve(@my_fun,x0)</span><br><span class="line"></span><br><span class="line"><span class="comment">% 效果等同于</span></span><br><span class="line">syms x1 x2</span><br><span class="line">eqn =  [<span class="built_in">exp</span>(-<span class="built_in">exp</span>(-(x1+x2))) - x2*(<span class="number">1</span>+x1^<span class="number">2</span>) == <span class="number">0</span>, x1*<span class="built_in">cos</span>(x2) + x2*<span class="built_in">sin</span>(x1) - <span class="number">0.5</span> == <span class="number">0</span>]</span><br><span class="line">[answ_x1, answ_x2] = vpasolve(eqn, [x1, x2], [<span class="number">0</span> <span class="number">0</span>])</span><br></pre></td></tr></table></figure></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/blog/tags/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1/" rel="tag"># 数学建模</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E5%BE%AE%E5%88%86%E6%96%B9%E7%A8%8B%E6%A8%A1%E5%9E%8B/" rel="prev" title="数学建模-微分方程模型">
+                  <i class="fa fa-chevron-left"></i> 数学建模-微分方程模型
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B%E6%A8%A1%E5%9E%8B/" rel="next" title="数学建模-时间序列预测模型">
+                  数学建模-时间序列预测模型 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hauk</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/blog/js/utils.js"></script><script src="/blog/js/motion.js"></script><script src="/blog/js/schemes/muse.js"></script><script src="/blog/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'none'
+      },
+      options: {
+        renderActions: {
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/tex-mml-chtml.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.typesetClear();
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+
+
+</body>
+</html>

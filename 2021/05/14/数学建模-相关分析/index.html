@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"stabunkow.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","version":"8.2.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="相关分析 衡量两个变量因素的相关密切程度，看是否存在关系。 也存在一类 系统分析问题，多个因素决定系统的发展趋势，确定哪些是主要因素，哪些是次要因素；哪些因素对系统发展影响大，哪些因素对系统发展影响小；哪些因素起强化作用，哪些因素起弱化作用。 相关性不一定等于因果性。 Y 为因变量，存在连续数值型变量，0-1 型变量，定序变量，计数变量，生存变量等类型。 灰色关联分析 自变量、因变量关系分析。 使">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数学建模-相关分析">
+<meta property="og:url" content="http://stabunkow.github.io/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E7%9B%B8%E5%85%B3%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="Hauk&#39;s Blog">
+<meta property="og:description" content="相关分析 衡量两个变量因素的相关密切程度，看是否存在关系。 也存在一类 系统分析问题，多个因素决定系统的发展趋势，确定哪些是主要因素，哪些是次要因素；哪些因素对系统发展影响大，哪些因素对系统发展影响小；哪些因素起强化作用，哪些因素起弱化作用。 相关性不一定等于因果性。 Y 为因变量，存在连续数值型变量，0-1 型变量，定序变量，计数变量，生存变量等类型。 灰色关联分析 自变量、因变量关系分析。 使">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210420195641425.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210420195712666.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421194933248.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421194955219.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421195246218.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210514185558014.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421195558884.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421204346020.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421201421230.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421201614358.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421201715997.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421202030428.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421203644249.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421210006709.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421210511266.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508162157747.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508162228401.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508162533412.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508162737695.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508162839541.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508162950556.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508163028637.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508163415533.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508163436478.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508163536678.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508164338562.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508164359073.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508165044308.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508165309359.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508165536454.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508203145668.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508203232019.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508203304085.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508203454702.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508203625074.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508204728753.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508204849749.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508204925245.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508205412475.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508205747875.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508205914993.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508205959016.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508210313246.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508210337939.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508210414169.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508210442619.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508210801673.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508210856963.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508211323798.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508211552172.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210510201610695.png">
+<meta property="og:image" content="c:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20210510202637947.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210510211844171.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210510213019784.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210511134628445.png">
+<meta property="og:image" content="c:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20210510213247959.png">
+<meta property="og:image" content="c:/Users/admin/AppData/Roaming/Typora/typora-user-images/image-20210510213324032.png">
+<meta property="article:published_time" content="2021-05-14T12:01:00.000Z">
+<meta property="article:modified_time" content="2021-05-14T13:33:49.329Z">
+<meta property="article:author" content="Hauk">
+<meta property="article:tag" content="数学建模">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210420195641425.png">
+
+
+<link rel="canonical" href="http://stabunkow.github.io/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E7%9B%B8%E5%85%B3%E5%88%86%E6%9E%90/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>数学建模-相关分析 | Hauk's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hauk's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">~ o ha yo ~</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">相关分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%81%B0%E8%89%B2%E5%85%B3%E8%81%94%E5%88%86%E6%9E%90"><span class="nav-number">2.</span> <span class="nav-text">灰色关联分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#matlab-%E4%BD%BF%E7%94%A8"><span class="nav-number">2.1.</span> <span class="nav-text">Matlab 使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E7%B3%BB%E6%95%B0"><span class="nav-number">3.</span> <span class="nav-text">相关系数</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#pearson-%E7%B3%BB%E6%95%B0"><span class="nav-number">3.1.</span> <span class="nav-text">Pearson 系数</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E6%B3%A8%E6%84%8F%E7%82%B9"><span class="nav-number">3.1.1.</span> <span class="nav-text">操作注意点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%88%86%E5%B8%83%E6%A3%80%E9%AA%8C"><span class="nav-number">3.1.2.</span> <span class="nav-text">数据分布检验</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#jb-%E6%A3%80%E9%AA%8C"><span class="nav-number">3.1.2.1.</span> <span class="nav-text">JB 检验</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%B8%E5%85%B3%E6%98%BE%E8%91%97%E6%80%A7%E6%A3%80%E9%AA%8C"><span class="nav-number">3.1.3.</span> <span class="nav-text">相关显著性检验</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spearman-%E7%B3%BB%E6%95%B0"><span class="nav-number">3.2.</span> <span class="nav-text">Spearman 系数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E5%AF%B9%E6%AF%94"><span class="nav-number">3.3.</span> <span class="nav-text">使用对比</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B8%BB%E6%88%90%E5%88%86%E5%88%86%E6%9E%90"><span class="nav-number">4.</span> <span class="nav-text">主成分分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E6%AD%A5%E9%AA%A4"><span class="nav-number">4.1.</span> <span class="nav-text">关键步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E9%A2%98%E5%BC%95%E5%85%A5"><span class="nav-number">4.2.</span> <span class="nav-text">例题引入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E8%AF%B4%E6%98%8E"><span class="nav-number">4.3.</span> <span class="nav-text">分析说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#matlab-%E4%BD%BF%E7%94%A8-1"><span class="nav-number">4.4.</span> <span class="nav-text">Matlab 使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%A0%E5%AD%90%E5%88%86%E6%9E%90"><span class="nav-number">5.</span> <span class="nav-text">因子分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8E%E4%B8%BB%E6%88%90%E5%88%86%E5%88%86%E6%9E%90%E5%AF%B9%E6%AF%94"><span class="nav-number">5.1.</span> <span class="nav-text">与主成分分析对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E9%A2%98%E5%BC%95%E5%85%A5-1"><span class="nav-number">5.2.</span> <span class="nav-text">例题引入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E6%AD%A5%E9%AA%A4-1"><span class="nav-number">5.3.</span> <span class="nav-text">关键步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BD%BD%E8%8D%B7%E5%9B%A0%E5%AD%90%E7%9A%84%E7%BB%9F%E8%AE%A1%E6%84%8F%E4%B9%89"><span class="nav-number">5.4.</span> <span class="nav-text">载荷因子的统计意义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spss-%E6%93%8D%E4%BD%9C"><span class="nav-number">5.5.</span> <span class="nav-text">SPSS 操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%96%B9%E6%B3%95%E5%8F%8A%E5%88%86%E6%9E%90%E6%84%8F%E4%B9%89"><span class="nav-number">5.5.1.</span> <span class="nav-text">方法及分析意义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4"><span class="nav-number">5.5.2.</span> <span class="nav-text">操作步骤</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%85%B8%E5%9E%8B%E7%9B%B8%E5%85%B3%E5%88%86%E6%9E%90"><span class="nav-number">6.</span> <span class="nav-text">典型相关分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E9%A2%98%E5%BC%95%E5%85%A5-2"><span class="nav-number">6.1.</span> <span class="nav-text">例题引入</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E6%AD%A5%E9%AA%A4-2"><span class="nav-number">6.2.</span> <span class="nav-text">关键步骤</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#spss-%E6%93%8D%E4%BD%9C-1"><span class="nav-number">6.3.</span> <span class="nav-text">SPSS 操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4-1"><span class="nav-number">6.3.1.</span> <span class="nav-text">操作步骤</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%86%E6%9E%90%E8%A6%81%E7%82%B9"><span class="nav-number">6.3.2.</span> <span class="nav-text">分析要点</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Hauk</p>
+  <div class="site-description" itemprop="description">Try to write something.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/blog/archives">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://stabunkow.github.io/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E7%9B%B8%E5%85%B3%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="Hauk">
+      <meta itemprop="description" content="Try to write something.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hauk's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数学建模-相关分析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-05-14 20:01:00 / 修改时间：21:33:49" itemprop="dateCreated datePublished" datetime="2021-05-14T20:01:00+08:00">2021-05-14</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="相关分析">相关分析</h1>
+<p>衡量两个变量因素的相关密切程度，看是否存在关系。</p>
+<p>也存在一类 <strong>系统分析问题</strong>，多个因素决定系统的发展趋势，确定哪些是主要因素，哪些是次要因素；哪些因素对系统发展影响大，哪些因素对系统发展影响小；哪些因素起强化作用，哪些因素起弱化作用。</p>
+<p>相关性不一定等于因果性。</p>
+<p>Y 为因变量，存在连续数值型变量，0-1 型变量，定序变量，计数变量，生存变量等类型。</p>
+<h1 id="灰色关联分析">灰色关联分析</h1>
+<p>自变量、因变量关系分析。</p>
+<p>使用软件：Matlab。</p>
+<p>灰色关联分析的基本思想是根据 <strong>序列曲线几何形状</strong> 的 <strong>相似程度</strong> 来判断其联系是否紧密。</p>
+<p>分析图，可以发现 2003-2004 的突变趋势对 主序列 的影响较大。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210420195641425.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210420195712666.png" /></p>
+<h2 id="matlab-使用">Matlab 使用</h2>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">load gdp.mat </span><br><span class="line">Mean = <span class="built_in">mean</span>(gdp);</span><br><span class="line">gdp = gdp ./ <span class="built_in">repmat</span>(Mean, <span class="built_in">size</span>(gdp, <span class="number">1</span>), <span class="number">1</span>);</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27;预处理后的矩阵为：&#x27;</span>)</span><br><span class="line"><span class="built_in">disp</span>(gdp)</span><br><span class="line">Y = gdp(:, <span class="number">1</span>);  <span class="comment">% 母序列</span></span><br><span class="line">X = gdp(:, <span class="number">2</span>:<span class="keyword">end</span>); <span class="comment">% 子序列</span></span><br><span class="line">absX0_Xi = <span class="built_in">abs</span>(X - <span class="built_in">repmat</span>(Y, <span class="number">1</span>, <span class="built_in">size</span>(X,<span class="number">2</span>)))  <span class="comment">% 计算|X0-Xi|矩阵(在这里我们把X0定义为了Y)</span></span><br><span class="line">a = <span class="built_in">min</span>(<span class="built_in">min</span>(absX0_Xi))  <span class="comment">% 计算两级最小差a</span></span><br><span class="line">b = <span class="built_in">max</span>(<span class="built_in">max</span>(absX0_Xi))  <span class="comment">% 计算两级最大差b</span></span><br><span class="line">absX0_Xi = <span class="built_in">abs</span>(X - <span class="built_in">repmat</span>(Y, <span class="number">1</span>, <span class="built_in">size</span>(X,<span class="number">2</span>)))  <span class="comment">% 计算|X0-Xi|矩阵(在这里我们把X0定义为了Y)</span></span><br><span class="line">a = <span class="built_in">min</span>(<span class="built_in">min</span>(absX0_Xi))  <span class="comment">% 计算两级最小差a</span></span><br><span class="line">b = <span class="built_in">max</span>(<span class="built_in">max</span>(absX0_Xi))  <span class="comment">% 计算两级最大差b</span></span><br><span class="line">rho = <span class="number">0.5</span>; <span class="comment">% 分辨系数取0.5</span></span><br><span class="line"><span class="built_in">gamma</span> = (a + rho * b) ./ (absX0_Xi  + rho * b) <span class="comment">% 计算子序列中各个指标与母序列的关联系数</span></span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27;子序列中各个指标的灰色关联度分别为：&#x27;</span>)</span><br><span class="line"><span class="built_in">disp</span>(<span class="built_in">mean</span>(<span class="built_in">gamma</span>))</span><br></pre></td></tr></table></figure>
+<h1 id="相关系数">相关系数</h1>
+<p>变量间关系分析。</p>
+<p>使用软件：SPSS，Matlab。</p>
+<p>相关系数只是用来衡量两个变量 <strong>线性相关</strong> 程度的指标；也就是说，你必须 <strong>先确认</strong> 这两个变量是线性相关的，然后这个相关系数才能告诉你他俩相关程度如何。</p>
+<h2 id="pearson-系数">Pearson 系数</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421194933248.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421194955219.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421195246218.png" /></p>
+<p>标准化去除了量纲的影响，由于抽取的基本上都是样本，所以一般都是除以 <span class="math inline">\(n-1\)</span>。</p>
+<h3 id="操作注意点">操作注意点</h3>
+<p>注意点：所以在 Pearson 系数大的时候，还要画出散点图来查看，通过 SPSS 软件：</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210514185558014.png" /></p>
+<p>相关系数还要查看他的显著性水平（是不是对大多数数据符合规律，所以要进行假设检验）。</p>
+<p>可对各组数据之间计算 R 值相关性系数，表格表示各组之间的关系时可美化。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421195558884.png" /></p>
+<h3 id="数据分布检验">数据分布检验</h3>
+<p>除了预先画出散点图，感觉满足线性关系时，还要保证实验数据为正态分布。</p>
+<h4 id="jb-检验">JB 检验</h4>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421204346020.png" /></p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">x = normrnd(<span class="number">2</span>,<span class="number">3</span>,<span class="number">100</span>,<span class="number">1</span>);   <span class="comment">% 生成100*1的随机向量，每个元素是均值为2，标准差为3的正态分布</span></span><br><span class="line">skewness(x)  <span class="comment">%偏度</span></span><br><span class="line">kurtosis(x)  <span class="comment">%峰度</span></span><br><span class="line"></span><br><span class="line">n_c = <span class="built_in">size</span>(Test,<span class="number">2</span>);</span><br><span class="line">H = <span class="built_in">zeros</span>(<span class="number">1</span>,<span class="number">6</span>);</span><br><span class="line">P = <span class="built_in">zeros</span>(<span class="number">1</span>,<span class="number">6</span>);</span><br><span class="line"><span class="comment">% 对所有列数据进行 JB 检验</span></span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>:n_c</span><br><span class="line">    [h,p] = jbtest(Test(:,<span class="built_in">i</span>),<span class="number">0.05</span>);</span><br><span class="line">    H(<span class="built_in">i</span>)=h;</span><br><span class="line">    P(<span class="built_in">i</span>)=p;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">#### Shapiro-wilk 检验</span><br><span class="line"></span><br><span class="line">小样本检验，$<span class="number">3</span> \le n \le <span class="number">50</span>$。</span><br><span class="line"></span><br><span class="line">使用 SPSS 检验。</span><br><span class="line"></span><br><span class="line">![](https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421205227669.png)</span><br><span class="line"></span><br><span class="line">#### Q-Q 图检验</span><br><span class="line"></span><br><span class="line">要求数据量大。</span><br><span class="line"></span><br><span class="line">![](https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421205431670.png)</span><br><span class="line"></span><br><span class="line">​```matlab</span><br><span class="line"><span class="comment">% Q-Q图</span></span><br><span class="line">x = normrnd(<span class="number">2</span>, <span class="number">3</span>, <span class="number">100</span>,<span class="number">1</span>);   <span class="comment">% 生成100*1的随机向量，每个元素是均值为2，标准差为3的正态分布</span></span><br><span class="line">qqplot(x)</span><br><span class="line">qqplot(Test(:,<span class="number">1</span>))</span><br></pre></td></tr></table></figure>
+<h3 id="相关显著性检验">相关显著性检验</h3>
+<ul>
+<li>检验方法1</li>
+</ul>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421201421230.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421201614358.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421201715997.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421202030428.png" /></p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">R = corrcoef(Test); <span class="comment">% 对 R 进行检验</span></span><br><span class="line">x = <span class="number">-4</span>:<span class="number">0.1</span>:<span class="number">4</span>;</span><br><span class="line">y = tpdf(x, <span class="number">28</span>); <span class="comment">% 求t分布的概率密度值 28 是自由度  </span></span><br><span class="line"><span class="built_in">figure</span>(<span class="number">1</span>)</span><br><span class="line"><span class="built_in">plot</span>(x, y, <span class="string">&#x27;-&#x27;</span>)</span><br><span class="line">grid on </span><br><span class="line"><span class="built_in">hold</span> on </span><br><span class="line">tinv(<span class="number">0.975</span>,<span class="number">28</span>)    <span class="comment">% 可以求出 t分布临界值，0.975 双侧检验 2.0484</span></span><br><span class="line"><span class="built_in">plot</span>([<span class="number">-2.048</span>, <span class="number">-2.048</span>], [<span class="number">0</span>, tpdf(<span class="number">-2.048</span>, <span class="number">28</span>)], <span class="string">&#x27;r-&#x27;</span>)</span><br><span class="line"><span class="built_in">plot</span>([<span class="number">2.048</span>, <span class="number">2.048</span>], [<span class="number">0</span>, tpdf(<span class="number">2.048</span>, <span class="number">28</span>)], <span class="string">&#x27;r-&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<ul>
+<li>检验方法2</li>
+</ul>
+<p>更好的方法，<span class="math inline">\(p\)</span> 值检验法。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421203644249.png" /></p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">x = <span class="number">-4</span>:<span class="number">0.1</span>:<span class="number">4</span>;</span><br><span class="line">y = tpdf(x, <span class="number">28</span>);</span><br><span class="line"><span class="built_in">figure</span>(<span class="number">2</span>)</span><br><span class="line"><span class="built_in">plot</span>(x, y, <span class="string">&#x27;-&#x27;</span>)</span><br><span class="line">grid on </span><br><span class="line"><span class="built_in">hold</span> on</span><br><span class="line"><span class="built_in">plot</span>([<span class="number">-3.055</span>, <span class="number">-3.055</span>], [<span class="number">0</span>, tpdf(<span class="number">-3.055</span>, <span class="number">28</span>)], <span class="string">&#x27;r-&#x27;</span>)</span><br><span class="line"><span class="built_in">plot</span>([<span class="number">3.055</span>, <span class="number">3.055</span>], [<span class="number">0</span>, tpdf(<span class="number">3.055</span>, <span class="number">28</span>)], <span class="string">&#x27;r-&#x27;</span>)</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27;该检验值对应的p值为：&#x27;</span>)</span><br><span class="line"><span class="built_in">disp</span>((<span class="number">1</span> - tcdf(<span class="number">3.055</span>, <span class="number">28</span>)) * <span class="number">2</span>)  <span class="comment">% 双侧检验的p值要乘以2</span></span><br><span class="line"></span><br><span class="line">[R,P] = corrcoef(Test) <span class="comment">% 可用函数直接得出</span></span><br><span class="line">P &lt; <span class="number">0.01</span>  <span class="comment">% 标记3颗星的位置</span></span><br><span class="line">(P &lt; <span class="number">0.05</span>) .* (P &gt; <span class="number">0.01</span>)  <span class="comment">% 标记2颗星的位置</span></span><br><span class="line">(P &lt; <span class="number">0.1</span>) .* (P &gt; <span class="number">0.05</span>) <span class="comment">% 标记1颗星的位置</span></span><br></pre></td></tr></table></figure>
+<h2 id="spearman-系数">Spearman 系数</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421210006709.png" /></p>
+<p><strong>小样本情况</strong></p>
+<p><span class="math inline">\(n \le 30\)</span> 时，可直接使用相关系数查临界值表。</p>
+<p><strong>大样本情况</strong></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210421210511266.png" /></p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">% 计算矩阵各列的斯皮尔曼相关系数</span></span><br><span class="line">R = corr(Test, <span class="string">&#x27;type&#x27;</span> , <span class="string">&#x27;Spearman&#x27;</span>)</span><br><span class="line"><span class="comment">% 计算检验值</span></span><br><span class="line"><span class="built_in">disp</span>(<span class="built_in">sqrt</span>(<span class="number">590</span>)*<span class="number">0.0301</span>)</span><br><span class="line"><span class="comment">% 计算p值</span></span><br><span class="line"><span class="built_in">disp</span>((<span class="number">1</span> - normcdf(<span class="number">0.7311</span>))  *<span class="number">2</span>) <span class="comment">% normcdf用来计算标准正态分布的累积概率密度函数</span></span><br><span class="line"></span><br><span class="line"><span class="comment">% 直接给出相关系数和p值</span></span><br><span class="line">[R,P] = corr(Test, <span class="string">&#x27;type&#x27;</span> , <span class="string">&#x27;Spearman&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<h2 id="使用对比">使用对比</h2>
+<p>Spearman 相关系数和 Pearson 相关系数选择:</p>
+<ol type="1">
+<li><p>连续数据，正态分布，线性关系，用 Pearson 相关系数是最恰当，Spearman 相关系数效率没有 Pearson 相关系数高。</p></li>
+<li><p>上述任一条件不满足，就用spearman相关系数，不能用 Pearson 相关系数。</p></li>
+<li><p>两个定序数据之间也用spearman相关系数，不能用 Pearson 相关系数。定序数据是指仅仅反映观测对象等级、顺序关系的数据。</p></li>
+</ol>
+<h1 id="主成分分析">主成分分析</h1>
+<p>自变量降维分析。</p>
+<p>解决问题所需软件：Matlab，其后可用 SPSS 来聚类或 Stata 来回归。</p>
+<p>主成分分析是一种 <strong>降维</strong> 算法，它能将多个指标转换为少数几个主成分，这些主成分是 <strong>原始变量的线性组合</strong>，且彼此之间互不 <strong>相关</strong>，其能反映出原始数据的大部分信息。一般来说，当研究的问题涉及到多变量且变量之间存在很强的 <strong>相关性</strong> 时，我们可考虑使用主成分分析的方法来对数据进行简化。</p>
+<p><strong>降维</strong> 是将高维度的数据（指标太多）保留下最重要的一些特征，去除噪声和不重要的特征，从而实现提升数据处理速度的目的。在实际的生产和应用中，降维在一定的信息损失范围内，可以为我们节省大量的时间和成本。降维也成为应用非常广泛的数据预处理方法。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508162157747.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508162228401.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508162533412.png" /></p>
+<h2 id="关键步骤">关键步骤</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508162737695.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508162839541.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508162950556.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508163028637.png" /></p>
+<h2 id="例题引入">例题引入</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508163415533.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508163436478.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508163536678.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508164338562.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508164359073.png" /></p>
+<h2 id="分析说明">分析说明</h2>
+<p>在主成分分析中，我们首先应保证所提取的前几个主成分的累计贡献率达到一个较高的水平，其次对这些被提取的主成分必须都能够给出符合实际背景和意义的解释。</p>
+<p>主成分的解释其含义一般多少带有点模糊性，不像原始变量的含义那么清楚、确切，这是变量降维过程中不得不付出的代价。因此，提取的主成分个数 m 通常应明显小于原始变量个数 p（除非 p 本身较小），否则维数降低的 “利” 可能抵不过主成分含义不如原始变量清楚的 “弊”。</p>
+<p>主成分分析的困难之处主要在于要能够给出主成分的较好解释，所提取的主成分中如有一个主成分解释不了，整个主成分分析也就失败了。主成分分析是变量降维的一种重要、常用的方法，简单的说，该方法要应用得成功，一是靠原始变量的合理选取，二是靠 “运气” 。</p>
+<p>主成分分析不可用于评价分析：</p>
+<ul>
+<li>主成分是降维算法，你既然已经有数据了，为什么不把这些数据的信息全部用上呢？主成分分析是会损失原始数据的信息的。</li>
+<li>指标可能有各种类型（极大、极小、区间等），主成分只有标准化的过程，并没有正向化的过程。</li>
+</ul>
+<p>可用于 <strong>聚类</strong> ，计算出第一主成分和第二主成分的值，将其视为两个新的指标（可以在图上直观的展示各样本的分布情况）。主成分聚类最大的意义就是能帮我们可视化最后的聚类效果，毕竟，使用主成分是会降低部分信息的。言外之意，只有在指标个数特别多，且指标之间存在很强的相关性时才用主成分聚类。</p>
+<p>可用于 <strong>回归</strong>，可用来解决 <em>多重共线性</em> 的问题。</p>
+<h2 id="matlab-使用-1">Matlab 使用</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508165044308.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508165309359.png" /></p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">load data1.mat   <span class="comment">% 主成分聚类</span></span><br><span class="line">[n,p] = <span class="built_in">size</span>(x);  <span class="comment">% n是样本个数，p是指标个数</span></span><br><span class="line"></span><br><span class="line">X = zscore(x); R = cov(X); <span class="comment">% matlab内置的标准化函数（x-mean(x)）/std(x)</span></span><br><span class="line"><span class="comment">%% 或者</span></span><br><span class="line">R = corrcoef(x);</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27;样本相关系数矩阵为：&#x27;</span>)</span><br><span class="line"><span class="built_in">disp</span>(R)</span><br><span class="line"></span><br><span class="line">[V,D] = eig(R);  <span class="comment">% V 特征向量矩阵  D 特征值构成的对角矩阵</span></span><br><span class="line">lambda = <span class="built_in">diag</span>(D);  <span class="comment">% diag函数用于得到一个矩阵的主对角线元素值(返回的是列向量)</span></span><br><span class="line">lambda = lambda(<span class="keyword">end</span>:<span class="number">-1</span>:<span class="number">1</span>);  <span class="comment">% 因为lambda向量是从小大到排序的，将其调头</span></span><br><span class="line">contribution_rate = lambda / sum(lambda);</span><br><span class="line">cum_contribution_rate = cumsum(lambda)/ sum(lambda); <span class="comment">% cumsum是求累加值的函数</span></span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27;特征值为：&#x27;</span>)</span><br><span class="line"><span class="built_in">disp</span>(lambda&#x27;)  <span class="comment">% 转置为行向量，方便展示</span></span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27;贡献率为：&#x27;</span>)</span><br><span class="line"><span class="built_in">disp</span>(contribution_rate&#x27;)</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27;累计贡献率为：&#x27;</span>)</span><br><span class="line"><span class="built_in">disp</span>(cum_contribution_rate&#x27;)</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27;与特征值对应的特征向量矩阵为：&#x27;</span>)</span><br><span class="line"><span class="comment">%  rot90函数可以使一个矩阵逆时针旋转90度，然后再转置，就可以实现将矩阵的列颠倒的效果</span></span><br><span class="line">V=<span class="built_in">rot90</span>(V)&#x27;;</span><br><span class="line"><span class="built_in">disp</span>(V)</span><br><span class="line"></span><br><span class="line">m =input(<span class="string">&#x27;请输入需要保存的主成分的个数:  &#x27;</span>);</span><br><span class="line">F = <span class="built_in">zeros</span>(n,m);</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>:m</span><br><span class="line">    ai = V(:,<span class="built_in">i</span>)&#x27;;   <span class="comment">% 将第i个特征向量取出，并转置为行向量</span></span><br><span class="line">    Ai = <span class="built_in">repmat</span>(ai,n,<span class="number">1</span>);   <span class="comment">% 将这个行向量重复n次，构成一个n*p的矩阵</span></span><br><span class="line">    F(:, <span class="built_in">i</span>) = sum(Ai .* X, <span class="number">2</span>);  <span class="comment">% 注意，对标准化的数据求了权重后要计算 每一行 的和</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">%% (1)主成分聚类 ： 将主成分指标所在的F矩阵复制到Excel表格，然后再用Spss进行聚类</span></span><br><span class="line"><span class="comment">% 在Excel第一行输入指标名称（F1,F2, ..., Fm）</span></span><br><span class="line"><span class="comment">% 双击Matlab工作区的F,进入变量编辑中，然后复制里面的数据到Excel表格</span></span><br><span class="line"><span class="comment">% 导出数据之后，我们后续的分析就可以在Spss中进行。</span></span><br><span class="line"></span><br><span class="line"><span class="comment">%% (2)主成分回归：将x使用主成分得到主成分指标，并将y标准化，接着导出到Excel，然后再使用Stata回归</span></span><br><span class="line"><span class="comment">% Y = zscore(y);  % 一定要将y进行标准化</span></span><br><span class="line"><span class="comment">% 在Excel第一行输入指标名称（Y,F1, F2, ..., Fm）</span></span><br><span class="line"><span class="comment">% 分别双击Matlab工作区的Y和F,进入变量编辑中，然后复制里面的数据到Excel表格</span></span><br><span class="line"><span class="comment">% 导出数据之后，我们后续的分析就可以在Stata中进行。</span></span><br></pre></td></tr></table></figure>
+<p>提取完两个主成分后，可用于在 Stata 中进行回归。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508165536454.png" /></p>
+<h1 id="因子分析">因子分析</h1>
+<p>自变量降维分析。</p>
+<p>解决问题所需软件：SPSS。</p>
+<p><em>因子分析法</em> 通过研究变量间的相关系数矩阵，把这些变量间错综复杂的关系 <strong>归结</strong> 成少数几个 <strong>综合因子</strong>，由于归结出的因子个数少于原始变量的个数，但是它们又包含原始变量的信息，所以，这一分析过程也称为 <strong>降维</strong>。由于因子往往比主成分更易得到解释，故因子分析比主成分分析更容易成功，从而有更广泛的应用。</p>
+<h2 id="与主成分分析对比">与主成分分析对比</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508203145668.png" /></p>
+<h2 id="例题引入-1">例题引入</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508203232019.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508203304085.png" /></p>
+<h2 id="关键步骤-1">关键步骤</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508203454702.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508203625074.png" /></p>
+<p><em>为什么这样假设？</em></p>
+<ul>
+<li>公因子彼此不相关，且具有单位方差（标准化消除量纲）</li>
+<li>特殊因子彼此不相关且与公因子也不相关</li>
+</ul>
+<p><em>这样做有什么好处？</em></p>
+<p>因子载荷矩阵 A 可以不是唯一的，可以利用这一点，通过因子的变换，使得新的因子具有更容易 <strong>解释</strong> 的实际意义。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508204728753.png" /></p>
+<h2 id="载荷因子的统计意义">载荷因子的统计意义</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508204849749.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508204925245.png" /></p>
+<h2 id="spss-操作">SPSS 操作</h2>
+<h3 id="方法及分析意义">方法及分析意义</h3>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508205412475.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508205747875.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508205914993.png" /></p>
+<p>因子可以通过 <em>正交矩阵</em> 旋转，重新解释。得到因子模型后，其中的公共因子不一定能反映问题的实质特征，为了能更好地解释每一个公共因子的实际意义，且减少解释的主观性，可以通过 <em>因子旋转</em> 达到目的。<em>因子旋转</em> 分为正交旋转与斜交旋转，经过正交旋转而得到的新的公共因子仍然保持彼此独立的性质，而斜交旋转得到的公共因子是相关的（违背了最初的假定，因此可以看作传统因子分析的拓展），其实际意义更容易解释。但不论是正交旋转还是斜交旋转，都应当使新公共因子的载荷系数（每个 <span class="math inline">\(\alpha\)</span>）的绝对值尽可能接近 0 或 1（这里默认了我们从相关系数矩阵进行计算），<strong>方便解释</strong>。</p>
+<p>可以再对因子进行评价：因子分析是将变量表示为公共因子和特殊因子的线性组合，此外，我们可以 <strong>反过来</strong> 将公共因子表示为原变量的线性组合，即可得到 <em>因子得分</em>。</p>
+<h3 id="操作步骤">操作步骤</h3>
+<p>1）先检验原始数据是否适合进行因子分析，并确定参考因子个数</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508205959016.png" /></p>
+<p>KMO检验和巴特利特球形检验（样本数要大于指标数）：</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508210313246.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508210337939.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508210414169.png" /></p>
+<p>2）调整因子个数后重新计算</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508210442619.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508210801673.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508210856963.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508211323798.png" /></p>
+<p>旋转后的成分矩阵更易于解释：比如成分 1 可以解释为持久力，成分 2 可以解释为爆发力。</p>
+<p>还可以用 <em>因子得分</em> 做一些跟 <em>主成分分析</em> 一样的事：</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210508211552172.png" /></p>
+<h1 id="典型相关分析">典型相关分析</h1>
+<p>自变量组相关分析。</p>
+<p>解决问题所需软件：SPSS。</p>
+<p>研究 <strong>两组</strong> 变量之间相关关系的一种多元统计方法。（每组变量中都可能有 <strong>多个</strong> 指标）</p>
+<h2 id="例题引入-2">例题引入</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210510201610695.png" /></p>
+<p>直接对这些变量的相关进行两两分析（<em>相关性分析</em>），很难得到关于这 <strong>两组</strong> 变量（如观众和业内人士）之间关系的一个清楚的印象。</p>
+<p><em>典型相关分析</em> 把多个变量与多个变量之间的相关化为两个具有代表性的变量之间的相关。</p>
+<p><em>每组选谁最代表？</em> 一组变量最简单的综合形式就是该组变量的 <strong>线性组合</strong>。</p>
+<p>被选出的线性组合配对称为典型变量，它们的相关系数称为 <strong>典型相关系数</strong>。</p>
+<p><img src="C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20210510202637947.png" /></p>
+<h2 id="关键步骤-2">关键步骤</h2>
+<ol type="1">
+<li><p>数据分布假设</p>
+<p>两组数据服从联合正态分布。</p></li>
+<li><p>两组变量的相关性检验</p>
+<p>构造似然比统计量，p 值小于 0.05 表示在 95% 的置信水平（5% 的显著性水平）下拒绝原假设，即认为两组变量有关。</p></li>
+<li><p>确定典型变量的个数</p>
+<p>直接看典型相关系数对应的 p 值即可，说明可以使用该典型相关系数。</p></li>
+<li><p>利用标准化后的典型相关变量分析问题</p>
+<p>消除量纲的影响。</p></li>
+<li><p>进行典型载荷分析（对可使用的典型相关系数）</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210510211844171.png" /></p></li>
+<li><p>进行典型变量对样本总方差的贡献分析</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210510213019784.png" /></p></li>
+</ol>
+<h2 id="spss-操作-1">SPSS 操作</h2>
+<h3 id="操作步骤-1">操作步骤</h3>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210511134628445.png" /></p>
+<h3 id="分析要点">分析要点</h3>
+<p><img src="C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20210510213247959.png" /></p>
+<p><img src="C:\Users\admin\AppData\Roaming\Typora\typora-user-images\image-20210510213324032.png" /></p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/blog/tags/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1/" rel="tag"># 数学建模</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E4%BC%98%E5%8C%96%E9%97%AE%E9%A2%98/" rel="prev" title="数学建模-优化问题">
+                  <i class="fa fa-chevron-left"></i> 数学建模-优化问题
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E5%BE%AE%E5%88%86%E6%96%B9%E7%A8%8B%E6%A8%A1%E5%9E%8B/" rel="next" title="数学建模-微分方程模型">
+                  数学建模-微分方程模型 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hauk</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/blog/js/utils.js"></script><script src="/blog/js/motion.js"></script><script src="/blog/js/schemes/muse.js"></script><script src="/blog/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'none'
+      },
+      options: {
+        renderActions: {
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/tex-mml-chtml.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.typesetClear();
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+
+
+</body>
+</html>

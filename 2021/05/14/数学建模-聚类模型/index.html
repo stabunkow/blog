@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"stabunkow.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","version":"8.2.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="聚类模型 聚类，就是将样本划分为由类似的对象组成的多个类的过程。聚类后，我们可以更加准确的在每个类中单独使用统计模型进行估计、分析或预测；也可以探究不同类之间的相关性和主要差异。 分类是已知类别的，聚类未知。 样本与样本之间的常用距离有欧式距离、或者曼哈顿距离等。 也可以将指标和样本矩阵倒转，指标进行聚类，以相关系数衡量夹角距离。  K-means 算法  指定需要划分的簇的个数K值（类的个数）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数学建模-聚类模型">
+<meta property="og:url" content="http://stabunkow.github.io/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E8%81%9A%E7%B1%BB%E6%A8%A1%E5%9E%8B/index.html">
+<meta property="og:site_name" content="Hauk&#39;s Blog">
+<meta property="og:description" content="聚类模型 聚类，就是将样本划分为由类似的对象组成的多个类的过程。聚类后，我们可以更加准确的在每个类中单独使用统计模型进行估计、分析或预测；也可以探究不同类之间的相关性和主要差异。 分类是已知类别的，聚类未知。 样本与样本之间的常用距离有欧式距离、或者曼哈顿距离等。 也可以将指标和样本矩阵倒转，指标进行聚类，以相关系数衡量夹角距离。  K-means 算法  指定需要划分的簇的个数K值（类的个数）">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426195316752.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426193957697.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426194018560.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426194949309.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426195100447.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426195951206.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426200151578.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426200251752.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426200357762.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426200530564.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426200744139.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426200859594.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426201112210.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426201348799.png">
+<meta property="article:published_time" content="2021-05-14T12:01:22.000Z">
+<meta property="article:modified_time" content="2021-05-14T13:33:49.329Z">
+<meta property="article:author" content="Hauk">
+<meta property="article:tag" content="数学建模">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426195316752.png">
+
+
+<link rel="canonical" href="http://stabunkow.github.io/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E8%81%9A%E7%B1%BB%E6%A8%A1%E5%9E%8B/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>数学建模-聚类模型 | Hauk's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hauk's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">~ o ha yo ~</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%81%9A%E7%B1%BB%E6%A8%A1%E5%9E%8B"><span class="nav-number">1.</span> <span class="nav-text">聚类模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#k-means-%E7%AE%97%E6%B3%95"><span class="nav-number">2.</span> <span class="nav-text">K-means 算法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#k-means-%E7%AE%97%E6%B3%95-1"><span class="nav-number">3.</span> <span class="nav-text">K-means++ 算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#spss-%E6%93%8D%E4%BD%9C"><span class="nav-number">3.1.</span> <span class="nav-text">SPSS 操作</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%B3%BB%E7%BB%9F%E5%B1%82%E6%AC%A1%E8%81%9A%E7%B1%BB"><span class="nav-number">4.</span> <span class="nav-text">系统（层次）聚类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#spss-%E6%93%8D%E4%BD%9C-1"><span class="nav-number">4.1.</span> <span class="nav-text">SPSS 操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BC%B0%E8%AE%A1%E8%81%9A%E7%B1%BB%E6%95%B0%E9%87%8F"><span class="nav-number">4.2.</span> <span class="nav-text">估计聚类数量</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#dbscan-%E7%AE%97%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">DBSCAN 算法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#section"><span class="nav-number">6.</span> <span class="nav-text"></span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Hauk</p>
+  <div class="site-description" itemprop="description">Try to write something.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/blog/archives">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://stabunkow.github.io/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E8%81%9A%E7%B1%BB%E6%A8%A1%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="Hauk">
+      <meta itemprop="description" content="Try to write something.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hauk's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数学建模-聚类模型
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-05-14 20:01:22 / 修改时间：21:33:49" itemprop="dateCreated datePublished" datetime="2021-05-14T20:01:22+08:00">2021-05-14</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="聚类模型">聚类模型</h1>
+<p>聚类，就是将样本划分为由类似的对象组成的多个类的过程。聚类后，我们可以更加准确的在每个类中单独使用统计模型进行估计、分析或预测；也可以探究不同类之间的相关性和主要差异。</p>
+<p>分类是已知类别的，聚类未知。</p>
+<p>样本与样本之间的常用距离有欧式距离、或者曼哈顿距离等。</p>
+<p>也可以将指标和样本矩阵倒转，指标进行聚类，以相关系数衡量夹角距离。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426195316752.png" /></p>
+<h1 id="k-means-算法">K-means 算法</h1>
+<ol type="1">
+<li>指定需要划分的簇的个数K值（类的个数）</li>
+<li>随机地选择K个数据对象作为初始的聚类中心</li>
+<li>计算其余的各个数据对象到这K个初始聚类中心的距离，把数据对象划归到距离它最近的那个中心所处在的簇类中</li>
+<li>调整新类并且重新计算出新类的中心</li>
+<li>循环步骤 3 和 4，看中心是否收敛（不变），如果收敛或达到迭代次数则停止循环</li>
+<li>结束</li>
+</ol>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426193957697.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426194018560.png" /></p>
+<p>优点：</p>
+<ol type="1">
+<li>算法简单、快速</li>
+<li>对处理大数据集，该算法是相对高效率的</li>
+</ol>
+<p>缺点：</p>
+<ol type="1">
+<li>用户必须事先给出要生成的簇的数目K</li>
+<li><strong>对初值敏感</strong> （不同初值会分类结果不同）</li>
+<li><strong>对于孤立点数据敏感</strong> （孤立点不能单独形成类）</li>
+</ol>
+<h1 id="k-means-算法-1">K-means++ 算法</h1>
+<p>选择初始聚类中心的基本原则是：初始的聚类中心之间的相互距离要尽可能的远。</p>
+<p>对 <strong>初始化K个聚类中心</strong> 进行了优化</p>
+<ol type="1">
+<li>随机选取一个样本作为第一个聚类中心</li>
+<li>计算每个样本与当前已有聚类中心的最短距离（即与最近一个聚类中心的距离），这个值越大，表示被选取作为聚类中心的概率较大；最后，用轮盘法（依据概率大小来进行抽选）选出下一个聚类中心。</li>
+<li>重复步骤 2，直到选出K个聚类中心。</li>
+</ol>
+<p>分几类主要取决于个人的经验与感觉，通常的做法是多尝试几个 K 值，看分成几类的结果更好 <strong>解释</strong>，更符合分析 <strong>目的 </strong>等。</p>
+<p>数据的量纲不一致时，需要标准化。</p>
+<h2 id="spss-操作">SPSS 操作</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426194949309.png" /></p>
+<h1 id="系统层次聚类">系统（层次）聚类</h1>
+<p>系统聚类的合并算法通过计算两类数据点间的距离，对最为接近的两类数据点进行组合，并反复迭代这一过程，直到将所有数据点合成一类，并生成聚类谱系图。</p>
+<p>类与类之间的常用距离：最短距离法、最长距离法、组间平均连接法、组内平均连接法、重心法等。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426195100447.png" /></p>
+<ol type="1">
+<li>将每个对象看作一类，计算两两之间的最小距离</li>
+<li>将距离最小的两个类合并成一个新类</li>
+<li>重新计算新类与所有类之间的距离</li>
+<li>重复 2、3 两步，直到所有类最后合并成一类</li>
+<li>结束</li>
+</ol>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426195951206.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426200151578.png" /></p>
+<h2 id="spss-操作-1">SPSS 操作</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426200251752.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426200357762.png" /></p>
+<h2 id="估计聚类数量">估计聚类数量</h2>
+<p><strong>肘部法则</strong>：通过图形大致的估计出最优的聚类数量。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426200530564.png" /></p>
+<p>把数据粘贴到Excel表格中，并按照降序排好。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426200744139.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426200859594.png" /></p>
+<p>当指标个数为 2 或者 3 的时候可以再做散点图画图。</p>
+<h1 id="dbscan-算法">DBSCAN 算法</h1>
+<p>一种基于密度的聚类方法，聚类前不需要预先指定聚类的个数，生成的簇的个数不定（和数据有关）。要求聚类空间中的一定区域内所包含对象（点或其他空间对象）的数目不小于某一给定阈值。能在具有 <strong>噪声 </strong> 的空间数据库中发现任意形状的簇，可将密度足够大的相邻区域连接，能有效处理异常数据。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426201112210.png" /></p>
+<ul>
+<li>核心点及边界点：在半径 Eps 内含有不少于 MinPts 数目的点；在半径 Eps 内点的数量小于 MinPts，落在核心点的邻域内。</li>
+<li>噪音点：既不是核心点也不是边界点的点，单独成点</li>
+</ul>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210426201348799.png" /></p>
+<p>优点：</p>
+<ol type="1">
+<li>基于密度定义，能处理任意形状和大小的簇</li>
+<li>可在聚类的同时发现异常点</li>
+<li>与K-means比较起来，不需要输入要划分的聚类个数</li>
+</ol>
+<p>缺点：</p>
+<ol type="1">
+<li>输入参数 ε 和 Minpts 敏感，确定参数困难</li>
+<li>由于DBSCAN算法中，变量 ε 和 Minpts 是全局唯一的，当聚类的密度不 <strong>均匀</strong> 时，聚类距离相差很大时，聚类质量差</li>
+<li>当数据量大时，计算密度单元的计算复杂度大</li>
+</ol>
+<p>做出散点图后发现数据表现得很 "DBSCAN"，这时候再用 DBSCAN 进行聚类。</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[IDX, isnoise]</span>=<span class="title">DBSCAN</span><span class="params">(X,epsilon,MinPts)</span></span></span><br><span class="line">    C=<span class="number">0</span>;</span><br><span class="line">    n=<span class="built_in">size</span>(X,<span class="number">1</span>);</span><br><span class="line">    IDX=<span class="built_in">zeros</span>(n,<span class="number">1</span>);</span><br><span class="line">    D=pdist2(X,X); <span class="comment">% 生成距离矩阵</span></span><br><span class="line">    visited=<span class="built_in">zeros</span>(n,<span class="number">1</span>);</span><br><span class="line">    isnoise=<span class="built_in">zeros</span>(n,<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">for</span> <span class="built_in">i</span>=<span class="number">1</span>:n</span><br><span class="line">        <span class="keyword">if</span> visited(<span class="built_in">i</span>)==<span class="number">0</span></span><br><span class="line">            visited(<span class="built_in">i</span>)=<span class="number">1</span>;</span><br><span class="line">            Neighbors=RegionQuery(<span class="built_in">i</span>);</span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">numel</span>(Neighbors)&lt;MinPts</span><br><span class="line">                isnoise(<span class="built_in">i</span>)=<span class="number">1</span>;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                C=C+<span class="number">1</span>;</span><br><span class="line">                ExpandCluster(<span class="built_in">i</span>,Neighbors,C);</span><br><span class="line">            <span class="keyword">end</span></span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">ExpandCluster</span><span class="params">(i,Neighbors,C)</span></span></span><br><span class="line">        IDX(<span class="built_in">i</span>)=C;</span><br><span class="line">        k = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span> <span class="built_in">true</span></span><br><span class="line">            <span class="built_in">j</span> = Neighbors(k);</span><br><span class="line">            <span class="keyword">if</span> visited(<span class="built_in">j</span>)==<span class="number">0</span></span><br><span class="line">                visited(<span class="built_in">j</span>)=<span class="number">1</span></span><br><span class="line">                Neighbors2=RegionQuery(<span class="built_in">j</span>);</span><br><span class="line">                <span class="keyword">if</span> <span class="built_in">numel</span>(Neighbors2)&gt;=MinPts</span><br><span class="line">                    Neighbors=[Neighbors Neighbors2];</span><br><span class="line">                <span class="keyword">end</span></span><br><span class="line">            <span class="keyword">end</span></span><br><span class="line">            <span class="keyword">if</span> IDX(<span class="built_in">j</span>)==<span class="number">0</span></span><br><span class="line">                IDX(<span class="built_in">j</span>)=C;</span><br><span class="line">            <span class="keyword">end</span></span><br><span class="line">            k = k + <span class="number">1</span>;</span><br><span class="line">            <span class="keyword">if</span> k &gt; <span class="built_in">numel</span>(Neighbors)</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">end</span></span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">Neighbors</span>=<span class="title">RegionQuery</span><span class="params">(i)</span></span></span><br><span class="line">        Neighbors=<span class="built_in">find</span>(D(<span class="built_in">i</span>,:)&lt;=epsilon);</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">PlotClusterinResult</span><span class="params">(X, IDX)</span></span></span><br><span class="line">    k=<span class="built_in">max</span>(IDX);</span><br><span class="line">    Colors=hsv(k);</span><br><span class="line">    Legends = &#123;&#125;;</span><br><span class="line">    <span class="keyword">for</span> <span class="built_in">i</span>=<span class="number">0</span>:k</span><br><span class="line">        Xi=X(IDX==<span class="built_in">i</span>,:);</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">i</span>~=<span class="number">0</span></span><br><span class="line">            Style = <span class="string">&#x27;x&#x27;</span>;</span><br><span class="line">            MarkerSize = <span class="number">8</span>;</span><br><span class="line">            Color = Colors(<span class="built_in">i</span>,:);</span><br><span class="line">            Legends&#123;<span class="keyword">end</span>+<span class="number">1</span>&#125; = [<span class="string">&#x27;Cluster #&#x27;</span> num2str(<span class="built_in">i</span>)];</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            Style = <span class="string">&#x27;o&#x27;</span>;</span><br><span class="line">            MarkerSize = <span class="number">6</span>;</span><br><span class="line">            Color = [<span class="number">0</span> <span class="number">0</span> <span class="number">0</span>];</span><br><span class="line">            <span class="keyword">if</span> ~<span class="built_in">isempty</span>(Xi)</span><br><span class="line">                Legends&#123;<span class="keyword">end</span>+<span class="number">1</span>&#125; = <span class="string">&#x27;Noise&#x27;</span>;</span><br><span class="line">            <span class="keyword">end</span></span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> ~<span class="built_in">isempty</span>(Xi)</span><br><span class="line">            <span class="built_in">plot</span>(Xi(:,<span class="number">1</span>),Xi(:,<span class="number">2</span>),Style,<span class="string">&#x27;MarkerSize&#x27;</span>,MarkerSize,<span class="string">&#x27;Color&#x27;</span>,Color);</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">        <span class="built_in">hold</span> on</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="built_in">hold</span> off</span><br><span class="line">    axis equal</span><br><span class="line">    grid on</span><br><span class="line">    <span class="built_in">legend</span>(Legends)</span><br><span class="line">    <span class="built_in">legend</span>(<span class="string">&#x27;Location&#x27;</span>, <span class="string">&#x27;NorthEastOutside&#x27;</span>)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">epsilon=<span class="number">0.5</span>;</span><br><span class="line">MinPts=<span class="number">10</span>;</span><br><span class="line">IDX=DBSCAN(X,epsilon,MinPts);</span><br><span class="line">PlotClusterinResult(X, IDX);</span><br></pre></td></tr></table></figure>
+<h1 id="section"></h1>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/blog/tags/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1/" rel="tag"># 数学建模</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E5%9B%9E%E5%BD%92%E5%88%86%E6%9E%90/" rel="prev" title="数学建模-回归分析">
+                  <i class="fa fa-chevron-left"></i> 数学建模-回归分析
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E5%88%86%E7%B1%BB%E6%A8%A1%E5%9E%8B/" rel="next" title="数学建模-分类模型">
+                  数学建模-分类模型 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hauk</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/blog/js/utils.js"></script><script src="/blog/js/motion.js"></script><script src="/blog/js/schemes/muse.js"></script><script src="/blog/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'none'
+      },
+      options: {
+        renderActions: {
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/tex-mml-chtml.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.typesetClear();
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+
+
+</body>
+</html>

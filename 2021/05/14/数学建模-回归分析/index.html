@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"stabunkow.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","version":"8.2.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="回归分析 回归分析的使命：  判断哪些 X 变量是同 Y 真的相关 判断相关性是正的还是负的 估计回归系数权重（还要标准化去量纲之后）  回归分析的分类：  回归的方法和评价跟 拟合 类似。 使用软件：Stata。 合理预测模型   多元线性回归 跟拟合类似，对横截面数据进行回归。 一元线性回归，一般称 \(y_i&#x3D;\beta_0+\beta_1x_i+\mu_i\) 添加残差。 自变量和因变量可">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数学建模-回归分析">
+<meta property="og:url" content="http://stabunkow.github.io/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E5%9B%9E%E5%BD%92%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="Hauk&#39;s Blog">
+<meta property="og:description" content="回归分析 回归分析的使命：  判断哪些 X 变量是同 Y 真的相关 判断相关性是正的还是负的 估计回归系数权重（还要标准化去量纲之后）  回归分析的分类：  回归的方法和评价跟 拟合 类似。 使用软件：Stata。 合理预测模型   多元线性回归 跟拟合类似，对横截面数据进行回归。 一元线性回归，一般称 \(y_i&#x3D;\beta_0+\beta_1x_i+\mu_i\) 添加残差。 自变量和因变量可">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422162048564.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429164529866.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429164546728.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422162439941.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423164647820.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423165346306.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422162618842.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422162842676.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423141516797.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423141902121.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423140237418.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423145809163.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423165603084.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423165909057.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423165933033.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423170638310.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429162305389.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429163406220.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429163156212.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429163752681.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429163818936.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429163935237.png">
+<meta property="article:published_time" content="2021-05-14T12:01:12.000Z">
+<meta property="article:modified_time" content="2021-05-14T13:33:49.329Z">
+<meta property="article:author" content="Hauk">
+<meta property="article:tag" content="数学建模">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422162048564.png">
+
+
+<link rel="canonical" href="http://stabunkow.github.io/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E5%9B%9E%E5%BD%92%E5%88%86%E6%9E%90/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>数学建模-回归分析 | Hauk's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hauk's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">~ o ha yo ~</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%9E%E5%BD%92%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">回归分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%90%88%E7%90%86%E9%A2%84%E6%B5%8B%E6%A8%A1%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">合理预测模型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%A4%9A%E5%85%83%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92"><span class="nav-number">3.</span> <span class="nav-text">多元线性回归</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9E%E5%BD%92%E7%B3%BB%E6%95%B0"><span class="nav-number">3.1.</span> <span class="nav-text">回归系数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E5%8F%98%E9%87%8F"><span class="nav-number">3.2.</span> <span class="nav-text">虚拟变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%81%87%E5%AE%9A%E6%BB%A1%E8%B6%B3"><span class="nav-number">3.3.</span> <span class="nav-text">假定满足</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%86%85%E7%94%9F%E6%80%A7"><span class="nav-number">3.3.1.</span> <span class="nav-text">内生性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%A4%9A%E9%87%8D%E5%85%B1%E7%BA%BF%E6%80%A7"><span class="nav-number">3.3.2.</span> <span class="nav-text">多重共线性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%81%87%E8%AE%BE%E6%A3%80%E9%AA%8C"><span class="nav-number">3.3.2.1.</span> <span class="nav-text">假设检验</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95"><span class="nav-number">3.3.2.2.</span> <span class="nav-text">解决方法</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%B0%E5%8A%A8%E9%A1%B9"><span class="nav-number">3.3.3.</span> <span class="nav-text">扰动项</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BC%82%E6%96%B9%E5%B7%AE"><span class="nav-number">3.3.3.1.</span> <span class="nav-text">异方差</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%81%87%E8%AE%BE%E6%A3%80%E9%AA%8C-1"><span class="nav-number">3.3.3.1.1.</span> <span class="nav-text">假设检验</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E8%A7%A3%E5%86%B3%E6%96%B9%E6%B3%95-1"><span class="nav-number">3.3.3.1.2.</span> <span class="nav-text">解决方法</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%80%90%E6%AD%A5%E5%9B%9E%E5%BD%92"><span class="nav-number">3.4.</span> <span class="nav-text">逐步回归</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9E%E5%BD%92%E6%A8%A1%E5%9E%8B%E8%A7%A3%E9%87%8A"><span class="nav-number">3.5.</span> <span class="nav-text">回归模型解释</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9E%E5%BD%92%E8%AF%84%E4%BB%B7"><span class="nav-number">3.6.</span> <span class="nav-text">回归评价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#stata-%E4%BD%BF%E7%94%A8"><span class="nav-number">3.7.</span> <span class="nav-text">Stata 使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%B2%AD%E5%9B%9E%E5%BD%92-lasso-%E5%9B%9E%E5%BD%92"><span class="nav-number">4.</span> <span class="nav-text">岭回归 &#x2F; lasso 回归</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B2%AD%E5%9B%9E%E5%BD%92"><span class="nav-number">4.1.</span> <span class="nav-text">岭回归</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#lasso-%E5%9B%9E%E5%BD%92"><span class="nav-number">4.2.</span> <span class="nav-text">lasso 回归</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%95%E6%97%B6%E4%BD%BF%E7%94%A8"><span class="nav-number">4.3.</span> <span class="nav-text">何时使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#bp-%E7%A5%9E%E7%BB%8F%E7%AE%97%E6%B3%95"><span class="nav-number">5.</span> <span class="nav-text">BP 神经算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#matlab-%E4%BD%BF%E7%94%A8"><span class="nav-number">5.1.</span> <span class="nav-text">Matlab 使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83"><span class="nav-number">5.1.1.</span> <span class="nav-text">训练</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%84%E6%B5%8B"><span class="nav-number">5.1.2.</span> <span class="nav-text">预测</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E9%80%BB%E8%BE%91%E5%9B%9E%E5%BD%92"><span class="nav-number">6.</span> <span class="nav-text">逻辑回归</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Hauk</p>
+  <div class="site-description" itemprop="description">Try to write something.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/blog/archives">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://stabunkow.github.io/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E5%9B%9E%E5%BD%92%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="Hauk">
+      <meta itemprop="description" content="Try to write something.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hauk's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数学建模-回归分析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-05-14 20:01:12 / 修改时间：21:33:49" itemprop="dateCreated datePublished" datetime="2021-05-14T20:01:12+08:00">2021-05-14</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="回归分析">回归分析</h1>
+<p>回归分析的使命：</p>
+<ol type="1">
+<li>判断哪些 X 变量是同 Y 真的相关</li>
+<li>判断相关性是正的还是负的</li>
+<li>估计回归系数权重（还要标准化去量纲之后）</li>
+</ol>
+<p>回归分析的分类：</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422162048564.png" /></p>
+<p>回归的方法和评价跟 <strong>拟合</strong> 类似。</p>
+<p>使用软件：Stata。</p>
+<h1 id="合理预测模型">合理预测模型</h1>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429164529866.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429164546728.png" /></p>
+<h1 id="多元线性回归">多元线性回归</h1>
+<p>跟拟合类似，对横截面数据进行回归。</p>
+<p>一元线性回归，一般称 <span class="math inline">\(y_i=\beta_0+\beta_1x_i+\mu_i\)</span> 添加残差。</p>
+<p>自变量和因变量可通过变量转化变成线性模型，<span class="math inline">\(lny_i=\beta_0+\beta_1\ln{x_i}+\mu_i\)</span>, <span class="math inline">\(y_i=\beta_0+\beta_1x_i+\beta_2x_i^2+\mu_i\)</span></p>
+<p>使用线性回归之前，需要对数据进行预处理。</p>
+<h2 id="回归系数">回归系数</h2>
+<p><span class="math inline">\(y_i=\beta_0+\beta_1x_i+\mu_i\)</span>， 称 <span class="math inline">\(\beta_0, \beta_1\)</span> 为回归系数。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422162439941.png" /></p>
+<h2 id="虚拟变量">虚拟变量</h2>
+<p>自变量中有定性变量，例如性别、地域，在回归中 <span class="math inline">\(y_i = \beta_0 + \beta_1x_{1i} + ... +\delta_0d_0+...+\mu_i\)</span></p>
+<p>变量 <span class="math inline">\(d_i\)</span> 取 0 或 1</p>
+<p>避免完全 <strong>多重共线性</strong> 的影响，引入虚拟变量的个数一般是分类数减1。</p>
+<h2 id="假定满足">假定满足</h2>
+<p>回归模型满足 4 个假定：</p>
+<p>假定1：线性假定，因变量与自变量存在线性关系</p>
+<p>假定2：严格外生性，所有的自变量跟扰动项不相关，保证估计出来的回归系数无偏且一致。</p>
+<p>假定3：完全多重无关性，保证能估计出来，自变量满足列满秩，<span class="math inline">\(X&#39;X\)</span> 可逆。</p>
+<p>假定4：球型干扰项，同方差，无自相关，<span class="math inline">\(E(\xi_i\xi_j|x) = 0\)</span>， <span class="math inline">\(\xi\)</span> 为扰动项。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423164647820.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423165346306.png" /></p>
+<h3 id="内生性">内生性</h3>
+<p>就是由尚未添加的变量，该变量既跟 y 有关，也跟已添加的自变量有关。</p>
+<figure>
+<img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422162618842.png" alt="image-20210422162618842" /><figcaption>image-20210422162618842</figcaption>
+</figure>
+<p>即 <span class="math inline">\(u_i\)</span> 其实包含其他相关变量影响，导致估计不准确。</p>
+<p>再以一个例子为例：</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210422162842676.png" /></p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">%% 蒙特卡洛模拟：内生性会造成回归系数的巨大误差</span></span><br><span class="line">times = <span class="number">300</span>; <span class="comment">% 蒙特卡洛的次数</span></span><br><span class="line">R = <span class="built_in">zeros</span>(times, <span class="number">1</span>);  <span class="comment">% 用来储存扰动项 u和x1 的相关系数</span></span><br><span class="line">K = <span class="built_in">zeros</span>(times, <span class="number">1</span>);  <span class="comment">% 用来储存遗漏了x2之后，只用y对x1回归得到的回归系数 k</span></span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>: times</span><br><span class="line">    n = <span class="number">30</span>;  <span class="comment">% 样本数据量为n</span></span><br><span class="line">    x1 = <span class="number">-10</span> + <span class="built_in">rand</span>(n, <span class="number">1</span>) * <span class="number">20</span>;   <span class="comment">% x1在-10和10上均匀分布，大小为30*1</span></span><br><span class="line">    u1 = normrnd(<span class="number">0</span>, <span class="number">5</span>, n, <span class="number">1</span>) - <span class="built_in">rand</span>(n, <span class="number">1</span>);  <span class="comment">% 随机生成一组符合正态分布的随机数</span></span><br><span class="line">    x2 = <span class="number">0.3</span> * x1 + u1;   <span class="comment">% x2与x1的相关性不确定，随机生成x2</span></span><br><span class="line">    u = normrnd(<span class="number">0</span>, <span class="number">1</span>, n, <span class="number">1</span>);  <span class="comment">% 扰动项u服从标准正态分布</span></span><br><span class="line">    y = <span class="number">0.5</span> + <span class="number">2</span> * x1 + <span class="number">5</span> * x2 + u;  <span class="comment">% 构造y</span></span><br><span class="line">    <span class="comment">% 最小二乘法估计出来的k y=kx+b</span></span><br><span class="line">    k = (n * sum(x1 .* y)-sum(x1) * sum(y))/(n * sum(x1 .* x1)-sum(x1)* sum(x1)); </span><br><span class="line">    K(<span class="built_in">i</span>) = k;</span><br><span class="line">    u = <span class="number">5</span> * x2 + u;  <span class="comment">%% 因为我们回归中忽略了 5*x2，所以扰动项要加上5*x2 （实际扰动存在内生性）</span></span><br><span class="line">    r = corrcoef(x1, u);  <span class="comment">% 2*2的相关系数矩阵 0说明不相关</span></span><br><span class="line">    R(<span class="built_in">i</span>) = r(<span class="number">2</span>, <span class="number">1</span>);</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="built_in">plot</span>(R, K, <span class="string">&#x27;*&#x27;</span>)</span><br><span class="line">xlabel(<span class="string">&quot;x_1和u&#x27;的相关系数&quot;</span>)</span><br><span class="line">ylabel(<span class="string">&quot;k的估计值&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>无内生性要求所有 <strong>解释变量（X）</strong> 跟 <strong>扰动项</strong> 不相关，确保其全部外生比较困难，但可以弱化此条件。</p>
+<p>将解释变量分为核心解释变量和控制变量两类：</p>
+<ul>
+<li><strong>核心解释变量</strong>：我们最感兴趣的变量，因此我们特别希望得到对其系数的一致估计（当样本容量无限增大时，收敛于待估计参数的真值）</li>
+<li><strong>控制变量</strong>：我们可能对于这些变量本身并无太大兴趣；而之所以把它们也放入回归方程，主要是为了“控制住”那些对被解释变量有影响的遗漏因素。</li>
+</ul>
+<p>在实际应用中，我们只要保证核心解释变量与𝝁不相关即可 （要求确保相关系数为0）。</p>
+<h3 id="多重共线性">多重共线性</h3>
+<p>某一解释变量可以由其他解释变量解释。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423141516797.png" /></p>
+<h4 id="假设检验">假设检验</h4>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423141902121.png" /></p>
+<h4 id="解决方法">解决方法</h4>
+<p>如果发现存在多重共线性，可以采取以下处理方法：</p>
+<ol type="1">
+<li>如果不关心具体的 <strong>回归系数</strong>，而只关心 <strong>整个方程</strong> 预测被解释变量的能力，则通常可以不必理会多重共线性（多重共线性的主要后果是使得对单个变量的贡献估计不准，但所有变量的整体效应仍可以较准确地估计）。</li>
+<li>关心具体的回归系数时，如果多重共线性并不影响所关心变量的 <strong>显著性</strong>，那么也可以不必理会；否则，需要增大样本容量，剔除导致严重共线性的变量（可能会有内生性的影响），或修改模型。</li>
+</ol>
+<h3 id="扰动项">扰动项</h3>
+<p>在之前的回归分析中，我们都默认了扰动项 <span class="math inline">\(\mu_i\)</span> 是球型扰动项。</p>
+<p>球型扰动项：满足 <strong>同方差</strong> 和 <strong>无自相关</strong> 两个条件。</p>
+<p>横截面数据容易出现 <em>异方差</em> 的问题，时间序列数据容易出现 <em>自相关</em> 的问题。</p>
+<h4 id="异方差">异方差</h4>
+<p>数据分布极度不平衡，如图示。<span class="math inline">\(OLS\)</span> 普通最小二乘法。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423140237418.png" /></p>
+<h5 id="假设检验-1">假设检验</h5>
+<p>BP 检验或者怀特检验，原假设，扰动项不存在异方差， P 值小于0.05，如果在95%的置信水平下拒绝原假设，即我们认为扰动项存在异方差。</p>
+<p>使用 Stata:</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 回归结束后使用</span></span><br><span class="line"><span class="keyword">estat</span> <span class="keyword">hettest</span>, rhs iid</span><br><span class="line"><span class="keyword">estat</span> <span class="keyword">imtest</span>, white</span><br></pre></td></tr></table></figure>
+<h5 id="解决方法-1">解决方法</h5>
+<ol type="1">
+<li>使用OLS + 稳健的标准误，如果发现存在异方差，一种处理方法是，仍然进行OLS 回归，但使用稳健标准误。这是最简单，也是目前通用的方法。只要样本容量较大，即使在异方差的情况下，若使用稳健标准误，则所有参数估计、假设检验均可照常进行。</li>
+<li>广义最小二乘法GLS，缺点：只能用样本数据来估计，这样得到的结果不稳健，存在偶然性。</li>
+</ol>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">regress</span> y x1 x2 ... xk, robust</span><br></pre></td></tr></table></figure>
+<h2 id="逐步回归">逐步回归</h2>
+<p><strong>向前逐步回归</strong>：将自变量逐个引入模型，每引入一个自变量后都要进行检验，显著时才加入回归模型。（缺点：随着以后其他自变量的引入，原来显著的自变量也可能又变为不显著了，但是，并没有将其及时从回归方程中剔除掉。）</p>
+<p><strong>向后逐步回归</strong>：先将所有变量均放入模型，之后尝试将其中一个自变量从模型中剔除，看整个模型解释因变量的变异是否有显著变化，之后将最没有解释力的那个自变量剔除；此过程不断迭代，直到没有自变量符合剔除的条件。（缺点：计算量大）</p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// stat 使用前需要剔除多重共线性</span></span><br><span class="line"><span class="keyword">stepwise</span> <span class="keyword">regress</span> y x1 x2 ... xk, pe(0.05)</span><br><span class="line"><span class="keyword">stepwise</span> <span class="keyword">regress</span> y x1 x2 ... xk, <span class="keyword">pr</span>(0.05)</span><br></pre></td></tr></table></figure>
+<h2 id="回归模型解释">回归模型解释</h2>
+<p>思考模型 <span class="math inline">\(y_i=\beta_0+\beta_1\ln{x_i}\)</span> 怎么解释？</p>
+<p>伍德里奇的《计量经济学导论，现代观点》有详细的论述：</p>
+<p>取对数意味着原被解释变量对解释变量的 <strong>弹性</strong>，即百分比的变化而不是数值的变化。取对数有一些经验法则：</p>
+<p>取对数的好处：（1）减弱数据的异方差性（2）如果变量本身不符合正态分布，取了对数后可能渐近服从正态分布（3）模型形式的需要，让模型具有经济学意义。</p>
+<ol type="1">
+<li>与市场价值相关的，例如，价格、销售额、工资等都可以取对数</li>
+<li>以年度量的变量，如受教育年限、工作经历等通常不取对数</li>
+<li>比例变量，如失业率、参与率等，两者均可；</li>
+<li>变量取值必须是非负数，如果包含0，则可以对 y 取对数 ln(1+y)</li>
+</ol>
+<p>取对数的好处：</p>
+<ol type="1">
+<li>减弱数据的 <strong>异方差性</strong></li>
+<li>如果变量本身不符合正态分布，取了对数后可能渐近服从正态分布</li>
+<li>模型形式的需要，让模型具有经济学意义</li>
+</ol>
+<p>四类模型回归系数的解释：</p>
+<ol type="1">
+<li>一元线性回归：𝑦 = 𝑎 + 𝑏𝑥+ 𝜇，x 每增加 1 个单位，y 平均变化 b 个单位</li>
+<li>双对数模型：𝑙𝑛𝑦= 𝑎+ 𝑏𝑙𝑛𝑥+ 𝜇，x 每增加 1%，y 平均变化b%</li>
+<li>半对数模型：𝑦 = 𝑎 + 𝑏𝑙𝑛𝑥+ 𝜇，x 每增加 1%，y 平均变化 b/100 个单位</li>
+<li>半对数模型：𝑙𝑛𝑦 = 𝑎+ 𝑏𝑥+ 𝜇，x 每增加 1 个单位，y 平均变化 (100b)%</li>
+</ol>
+<h2 id="回归评价">回归评价</h2>
+<p>预测型回归一般才会更看重 <span class="math inline">\(R^2\)</span>。</p>
+<p>解释型回归更多的关注模型整体 <strong>显著性</strong> 即可。</p>
+<p>可以对模型进行调整，例如对数据取对数或者平方后再进行回归.</p>
+<p>数据的分布极度不均匀，可能会导致 <span class="math inline">\(R^2\)</span> 较低。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423145809163.png" /></p>
+<p>在对 <strong>显著</strong> 的回归系数评价时，更为精准的研究影响评价量的重要因素（去除量纲的影响），我们可考虑使用 <strong>标准化</strong> 回归系数，标准化系数的绝对值越大，说明对因变量的影响就越大。</p>
+<p>要先说明在 <em>F 检验</em> 下回归效应显著，然后讲解各个回归系数。</p>
+<p><strong>某些错误的分析做法：</strong></p>
+<p>不可先对变量进行归一化，否则不好解释或有不好的影响。</p>
+<p>不要随便对模型变量（包含虚拟变量）复杂组合，否则不好解释。</p>
+<h2 id="stata-使用">Stata 使用</h2>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line">import excel <span class="string">&quot;课堂中讲解的奶粉数据.xlsx&quot;</span>, sheet(<span class="string">&quot;Sheet1&quot;</span>) firstrow</span><br><span class="line"><span class="comment">// 定量变量的描述性统计</span></span><br><span class="line"><span class="keyword">summarize</span> 团购价元 评价量 商品毛重kg</span><br><span class="line"><span class="comment">// 定性变量的频数分布，并得到相应字母开头的虚拟变量</span></span><br><span class="line"><span class="keyword">tabulate</span> 配方 ,<span class="keyword">gen</span>(A)</span><br><span class="line"><span class="keyword">tabulate</span> 奶源产地 ,<span class="keyword">gen</span>(B)</span><br><span class="line"><span class="keyword">tabulate</span> 国产或进口 ,<span class="keyword">gen</span>(C)</span><br><span class="line"><span class="keyword">tabulate</span> 适用年龄岁 ,<span class="keyword">gen</span>(<span class="keyword">D</span>)</span><br><span class="line"><span class="keyword">tabulate</span> 包装单位 ,<span class="keyword">gen</span>(<span class="keyword">E</span>)</span><br><span class="line"><span class="keyword">tabulate</span> 分类 ,<span class="keyword">gen</span>(F)</span><br><span class="line"><span class="keyword">tabulate</span> 段位 ,<span class="keyword">gen</span>(<span class="keyword">G</span>)</span><br><span class="line"><span class="comment">// 下面进行回归</span></span><br><span class="line"><span class="keyword">regress</span> 评价量 团购价元 商品毛重kg</span><br><span class="line"><span class="comment">// 得到标准化回归系数</span></span><br><span class="line"><span class="keyword">regress</span> 评价量 团购价元 商品毛重kg, b</span><br><span class="line"><span class="comment">// 画出残差图</span></span><br><span class="line"><span class="keyword">regress</span> 评价量 团购价元 商品毛重kg A1 A2 A3 B1 B2 B3 B4 B5 B6 B7 B8 B9 C1 C2 D1 D2 D3 D4 D5 E1 E2 E3 E4 F1 F2 G1 G2 G3 G4</span><br><span class="line"><span class="comment">// 残差与拟合值的散点图</span></span><br><span class="line"><span class="keyword">rvfplot</span> </span><br><span class="line"><span class="comment">// 残差与自变量团购价的散点图</span></span><br><span class="line"><span class="keyword">rvpplot</span>  团购价元</span><br><span class="line"></span><br><span class="line"><span class="comment">// 为什么评价量的拟合值会出现负数？</span></span><br><span class="line"><span class="comment">// 描述性统计并给出分位数对应的数值</span></span><br><span class="line"><span class="keyword">summarize</span> 评价量, <span class="keyword">d</span></span><br><span class="line"><span class="comment">// 作评价量的概率密度估计图</span></span><br><span class="line"><span class="keyword">kdensity</span> 评价量</span><br><span class="line"></span><br><span class="line"><span class="comment">// 异方差BP检验</span></span><br><span class="line"><span class="keyword">estat</span> <span class="keyword">hettest</span> ,rhs iid</span><br><span class="line"><span class="comment">// 异方差怀特检验</span></span><br><span class="line"><span class="keyword">estat</span> <span class="keyword">imtest</span>,white</span><br><span class="line"><span class="comment">// 使用OLS + 稳健的标准误</span></span><br><span class="line"><span class="keyword">regress</span> 评价量 团购价元 商品毛重kg A1 A2 A3 B1 B2 B3 B4 B5 B6 B7 B8 B9 C1 C2 D1 D2 D3 D4 D5 E1 E2 E3 E4 F1 F2 G1 G2 G3 G4, r</span><br><span class="line"></span><br><span class="line"><span class="comment">// 计算VIF</span></span><br><span class="line"><span class="keyword">estat</span>  <span class="keyword">vif</span></span><br></pre></td></tr></table></figure>
+<h1 id="岭回归-lasso-回归">岭回归 / lasso 回归</h1>
+<p>使用软件：Stata。</p>
+<p>主要是为了解决 <strong>多重共线性</strong> 的问题。</p>
+<p>岭回归和 lasso 回归在 OLS 回归模型的损失函数上加上了不同的惩罚项，该惩罚项由 <strong>回归系数的函数</strong> 构成：</p>
+<ul>
+<li><p>一方面，加入的惩罚项能够识别出模型中不重要的变量，对模型起到简化作用，可以看作逐步回归法的升级版</p></li>
+<li><p>另一方面，加入的惩罚项能够让模型变得 <strong>可估计</strong></p></li>
+</ul>
+<h2 id="岭回归">岭回归</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423165603084.png" /></p>
+<p>所以选择不同 <span class="math inline">\(\lambda\)</span> 会得出不同的回归系数，选择 <span class="math inline">\(\lambda\)</span> 的方法：</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423165909057.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423165933033.png" /></p>
+<p>最小化均方预测误差方法，取不同的 <span class="math inline">\(\lambda\)</span> 然后多次进行 K 折交叉验证，使得整个样本的 MSPE （均方预测误差）最小。</p>
+<h2 id="lasso-回归">lasso 回归</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210423170638310.png" /></p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 注意：这里自变量的量纲相同所以不用标准化，如果需要标准化，那么可以借助Matlab的zscore函数，或者直接使用SPSS（分析-描述统计-描述：在描述列表的方框左下角，看到“将标准化得分另存为变量（Z）之后点击打勾，然后确定。）</span></span><br><span class="line"><span class="comment">// Stata一次只能标准化一个变量，例如： egen Y = std(单产)  这个代码就表示将单产标准化，得到的变量记为Y</span></span><br><span class="line">cvlasso 单产 种子费 化肥费 农药费 机械费 灌溉费, lopt seed(520) <span class="comment">// seed 不同种子</span></span><br></pre></td></tr></table></figure>
+<p>stata 会给出各 <span class="math inline">\(\lambda\)</span> 的计算结果，以及提出 0 系数后的回归结果。</p>
+<h2 id="何时使用">何时使用</h2>
+<p>最一般的OLS对数据进行回归，然后计算方差膨胀因子VIF，如果 VIF &gt;10 则说明存在多重共线性的问题，此时我们需要对变量进行筛选。</p>
+<h1 id="bp-神经算法">BP 神经算法</h1>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429162305389.png" /></p>
+<p>BP 反向传播，能够根据误差再去调整差值。</p>
+<p>神经网络的参数跟层数还有各样本输入特征值的数量密切相关，而且可以用来训练样本少而特征值多的数据集。</p>
+<p>效果不错，相当万金油，但是具体解释麻烦，<strong>简单数据集</strong> 最好还是用其他模型。</p>
+<p>使用软件：Matlab。</p>
+<h2 id="matlab-使用">Matlab 使用</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429163406220.png" /></p>
+<h3 id="训练">训练</h3>
+<p>设置数据集比例：</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429163156212.png" /></p>
+<p>训练算法有以下 3 种：</p>
+<ul>
+<li><p>Levenberg–Marquardt algorithm：能提供数非线性最小化（局部最小）的数值解，速度最快</p></li>
+<li><p>Scaled Conjugate Gradient</p></li>
+<li><p>Bayesian‐regularization：速度最慢，收敛次数多，拟合效果最好</p></li>
+</ul>
+<p>一般我们还可以主动把数据集分割开，用这 3 种训练算法算出后再看效果。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429163752681.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429163818936.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210429163935237.png" /></p>
+<h3 id="预测">预测</h3>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">load data_Octane.mat</span><br><span class="line">nftool</span><br><span class="line"><span class="comment">% 根据训练出来的网络 net 预测</span></span><br><span class="line">sim(net, new_X(<span class="number">1</span>,:)&#x27;)</span><br><span class="line"></span><br><span class="line">predict_y = <span class="built_in">zeros</span>(<span class="number">10</span>,<span class="number">1</span>);</span><br><span class="line"><span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>: <span class="number">10</span></span><br><span class="line">    result = sim(net, new_X(<span class="built_in">i</span>,:)&#x27;);</span><br><span class="line">    predict_y(<span class="built_in">i</span>) = result;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27;预测值为：&#x27;</span>)</span><br><span class="line"><span class="built_in">disp</span>(predict_y)</span><br></pre></td></tr></table></figure>
+<h1 id="逻辑回归">逻辑回归</h1>
+<p>又称 Logistic 回归，由于对已知数据分类，详见分类模型。</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/blog/tags/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1/" rel="tag"># 数学建模</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E8%92%99%E7%89%B9%E5%8D%A1%E7%BD%97%E6%A8%A1%E6%8B%9F/" rel="prev" title="数学建模-蒙特卡罗模拟">
+                  <i class="fa fa-chevron-left"></i> 数学建模-蒙特卡罗模拟
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E8%81%9A%E7%B1%BB%E6%A8%A1%E5%9E%8B/" rel="next" title="数学建模-聚类模型">
+                  数学建模-聚类模型 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hauk</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/blog/js/utils.js"></script><script src="/blog/js/motion.js"></script><script src="/blog/js/schemes/muse.js"></script><script src="/blog/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'none'
+      },
+      options: {
+        renderActions: {
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/tex-mml-chtml.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.typesetClear();
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+
+
+</body>
+</html>

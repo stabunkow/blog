@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"stabunkow.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","version":"8.2.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="时间序列分析 时间序列也称动态序列，是指将某种现象的指标数值按照时间顺序排列而成的数值序列。 时间序列分析大致可分成三大部分，分别是描述过去、分析规律和预测未来。  时间序列由两个组成要素构成：  第一个要素是时间要素：年、季度、月、周、日、小时、分钟、秒 第二个要素是数值要素  时间序列可以分为时期时间序列和时点时间序列：  时期序列 中，数值要素反映现象在一定时期内发展的结果 时点序列 中，数">
+<meta property="og:type" content="article">
+<meta property="og:title" content="数学建模-时间序列预测模型">
+<meta property="og:url" content="http://stabunkow.github.io/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B%E6%A8%A1%E5%9E%8B/index.html">
+<meta property="og:site_name" content="Hauk&#39;s Blog">
+<meta property="og:description" content="时间序列分析 时间序列也称动态序列，是指将某种现象的指标数值按照时间顺序排列而成的数值序列。 时间序列分析大致可分成三大部分，分别是描述过去、分析规律和预测未来。  时间序列由两个组成要素构成：  第一个要素是时间要素：年、季度、月、周、日、小时、分钟、秒 第二个要素是数值要素  时间序列可以分为时期时间序列和时点时间序列：  时期序列 中，数值要素反映现象在一定时期内发展的结果 时点序列 中，数">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427153139000.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427153633160.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427153759975.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427154013293.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427154055743.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427154703653.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427154826619.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427154938459.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427155014860.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427155048405.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427155251732.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427155406628.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427160443250.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427160653727.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427161415441.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427161834051.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427161925157.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427162147223.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427162434210.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427162511905.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427162622987.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427163900337.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427164249314.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427165117945.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427165227078.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427165642561.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427170802064.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427172028993.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427172150223.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427190608642.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427191007976.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427191346473.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427191527084.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427192728250.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427193244049.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427193402971.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427193422471.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427193520111.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427193731632.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427194029531.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427194444160.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427194827652.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427195248970.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427195226853.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427195340604.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427195454598.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428141452691.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428141718171.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428141944170.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428142348994.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428142437533.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428142700532.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428164949228.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428165408638.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428165708350.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428165936523.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428170117415.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428170954491.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428171747866.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428171954961.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428182236623.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428182411169.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428183036016.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428183748156.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427200049434.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210514210415804.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210514210603197.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428105409192.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428112219505.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428112250580.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428112351973.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428112742127.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428112800341.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428130305431.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428130416367.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428130446738.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428130528074.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428130748041.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428130820019.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428131014195.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428131052801.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428150820881.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428150845208.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428150947333.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428151022241.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428151626110.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428151730932.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428151857264.png">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428152359223.png">
+<meta property="article:published_time" content="2021-05-14T12:01:03.000Z">
+<meta property="article:modified_time" content="2021-05-14T13:33:49.329Z">
+<meta property="article:author" content="Hauk">
+<meta property="article:tag" content="数学建模">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427153139000.png">
+
+
+<link rel="canonical" href="http://stabunkow.github.io/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B%E6%A8%A1%E5%9E%8B/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>数学建模-时间序列预测模型 | Hauk's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hauk's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">~ o ha yo ~</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">时间序列分析</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E8%A7%A3"><span class="nav-number">2.</span> <span class="nav-text">时间序列分解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#spss-%E6%93%8D%E4%BD%9C"><span class="nav-number">2.1.</span> <span class="nav-text">SPSS 操作</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%9C%AA%E6%9D%A5%E6%8C%87%E6%A0%87%E9%A2%84%E6%B5%8B"><span class="nav-number">3.</span> <span class="nav-text">未来指标预测</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8C%87%E6%95%B0%E5%B9%B3%E6%BB%91%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.1.</span> <span class="nav-text">指数平滑模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#simple-%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.1.1.</span> <span class="nav-text">Simple 模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9C%8D%E7%89%B9-%E5%B8%83%E6%9C%97%E7%BA%BF%E6%80%A7%E8%B6%8B%E5%8A%BF%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.1.2.</span> <span class="nav-text">霍特 &#x2F; 布朗线性趋势模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%98%BB%E5%B0%BC%E8%B6%8B%E5%8A%BF%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.1.3.</span> <span class="nav-text">阻尼趋势模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AE%80%E5%8D%95%E5%AD%A3%E8%8A%82%E6%80%A7%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.1.4.</span> <span class="nav-text">简单季节性模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B8%A9%E7%89%B9%E5%8A%A0%E6%B3%95%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.1.5.</span> <span class="nav-text">温特加法模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B8%A9%E7%89%B9%E4%B9%98%E6%B3%95%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.1.6.</span> <span class="nav-text">温特乘法模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E5%85%83%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E5%88%86%E6%9E%90%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.2.</span> <span class="nav-text">一元时间序列分析模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E7%9A%84%E5%B9%B3%E7%A8%B3%E6%80%A7"><span class="nav-number">3.2.1.</span> <span class="nav-text">时间序列的平稳性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%AE%E5%88%86%E6%96%B9%E7%A8%8B"><span class="nav-number">3.2.2.</span> <span class="nav-text">差分方程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BB%9E%E5%90%8E%E7%AE%97%E5%AD%90"><span class="nav-number">3.2.3.</span> <span class="nav-text">滞后算子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#arp-%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.2.4.</span> <span class="nav-text">AR(p) 模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#maq-%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.2.5.</span> <span class="nav-text">MA(q) 模型</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#maq-%E5%B9%B3%E7%A8%B3%E8%AF%81%E6%98%8E"><span class="nav-number">3.2.5.1.</span> <span class="nav-text">MA(q) 平稳证明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#armap-q-%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.2.6.</span> <span class="nav-text">ARMA(p, q) 模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#acf-%E7%9B%B8%E5%85%B3%E7%B3%BB%E6%95%B0"><span class="nav-number">3.2.7.</span> <span class="nav-text">ACF 相关系数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#pacf-%E5%81%8F%E8%87%AA%E7%9B%B8%E5%85%B3%E7%B3%BB%E6%95%B0"><span class="nav-number">3.2.8.</span> <span class="nav-text">PACF 偏自相关系数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#arma-%E6%A8%A1%E5%9E%8B%E8%AF%86%E5%88%AB%E5%92%8C%E4%BC%B0%E8%AE%A1"><span class="nav-number">3.2.9.</span> <span class="nav-text">ARMA 模型识别和估计</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E9%80%89%E6%8B%A9"><span class="nav-number">3.2.10.</span> <span class="nav-text">模型选择</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#arima-%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.2.11.</span> <span class="nav-text">ARIMA 模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sarima-%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.2.12.</span> <span class="nav-text">SARIMA 模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#arch-%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.2.13.</span> <span class="nav-text">ARCH 模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#garch-%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.2.14.</span> <span class="nav-text">GARCH 模型</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%81%B0%E8%89%B2%E9%A2%84%E6%B5%8B"><span class="nav-number">4.</span> <span class="nav-text">灰色预测</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#ols-%E5%9B%9E%E5%BD%92%E5%8E%9F%E7%90%86%E5%A4%8D%E4%B9%A0"><span class="nav-number">4.1.</span> <span class="nav-text">OLS 回归原理复习</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%87%86%E6%8C%87%E6%95%B0%E8%A7%84%E5%BE%8B%E6%A3%80%E9%AA%8C%E5%8F%8A%E8%AF%84%E4%BB%B7"><span class="nav-number">4.2.</span> <span class="nav-text">准指数规律检验及评价</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gm11%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%8B%93%E5%B1%95"><span class="nav-number">4.3.</span> <span class="nav-text">GM(1,1)模型的拓展</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%A3%E7%A0%81"><span class="nav-number">4.4.</span> <span class="nav-text">代码</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BE%8B%E9%A2%98%E6%BC%94%E7%A4%BA"><span class="nav-number">5.</span> <span class="nav-text">例题演示</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#spss-%E6%93%8D%E4%BD%9C-1"><span class="nav-number">5.1.</span> <span class="nav-text">SPSS 操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E9%A2%981.-%E9%94%80%E5%94%AE%E6%95%B0%E6%8D%AE%E9%A2%84%E6%B5%8B"><span class="nav-number">5.2.</span> <span class="nav-text">例题1. 销售数据预测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E9%A2%982.-%E4%BA%BA%E5%8F%A3%E6%95%B0%E6%8D%AE%E9%A2%84%E6%B5%8B"><span class="nav-number">5.3.</span> <span class="nav-text">例题2. 人口数据预测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E9%A2%983.-%E4%B8%8A%E8%AF%81%E6%8C%87%E6%95%B0%E9%A2%84%E6%B5%8B"><span class="nav-number">5.4.</span> <span class="nav-text">例题3. 上证指数预测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E9%A2%984.-gdp%E5%A2%9E%E9%80%9F%E9%A2%84%E6%B5%8B"><span class="nav-number">5.5.</span> <span class="nav-text">例题4. GDP增速预测</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%8B%E9%A2%985.-%E6%B7%B1%E6%88%90b%E6%8C%87%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B"><span class="nav-number">5.6.</span> <span class="nav-text">例题5. 深成B指时间序列预测</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Hauk</p>
+  <div class="site-description" itemprop="description">Try to write something.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/blog/archives">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://stabunkow.github.io/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E6%97%B6%E9%97%B4%E5%BA%8F%E5%88%97%E9%A2%84%E6%B5%8B%E6%A8%A1%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="Hauk">
+      <meta itemprop="description" content="Try to write something.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hauk's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          数学建模-时间序列预测模型
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-05-14 20:01:03 / 修改时间：21:33:49" itemprop="dateCreated datePublished" datetime="2021-05-14T20:01:03+08:00">2021-05-14</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="时间序列分析">时间序列分析</h1>
+<p>时间序列也称动态序列，是指将某种现象的指标数值按照时间顺序排列而成的数值序列。</p>
+<p>时间序列分析大致可分成三大部分，分别是描述过去、分析规律和预测未来。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427153139000.png" /></p>
+<p>时间序列由两个组成要素构成：</p>
+<ol type="1">
+<li>第一个要素是时间要素：年、季度、月、周、日、小时、分钟、秒</li>
+<li>第二个要素是数值要素</li>
+</ol>
+<p>时间序列可以分为时期时间序列和时点时间序列：</p>
+<ul>
+<li><strong>时期序列</strong> 中，数值要素反映现象在一定时期内发展的结果</li>
+<li><strong>时点序列</strong> 中，数值要素反映现象在一定时点上的瞬间水平</li>
+</ul>
+<p>时期序列可加，时点序列不可加。</p>
+<h1 id="时间序列分解">时间序列分解</h1>
+<p>因为时间序列是某个指标数值长期变化的数值表现，所以时间序列数值变化背后必然蕴含着数值变换的规律性，这些规律性就是时间序列分析的切入点。</p>
+<p>一般情况下，时间序列的 <strong>数值变化规律</strong> 有以下四种：（数值变化规律分开观察）</p>
+<ul>
+<li>长期变动趋势</li>
+<li>季节变动规律</li>
+<li>周期变动规律</li>
+<li>不规则变动（随机扰动项）</li>
+</ul>
+<p>一个时间序列往往是以上四类变化形式的 <strong>叠加</strong>。</p>
+<p>长期趋势 <strong>T</strong> 指的是统计指标在相当长的一段时间内，受到 <strong>长期趋势影响因素</strong> 的影响，表现出 <strong>持续上升</strong> 或 <strong>持续下降</strong> 的趋势，通常用字母 T 表示。例如，随着国家经济的发展，人均收入将逐渐提升；随着医学水平的提高，新生儿死亡率在不断下降。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427153633160.png" /></p>
+<p>季节趋势 <strong>S</strong> 是指由于 <strong>季节的转变</strong> 使得指标数值发生 <strong>周期性变动</strong> 。这里的季节是 <strong>广义</strong> 的，一般以月、季、周为时间单位，不能以 <strong>年</strong> 作单位。例如雪糕和棉衣的销量都会随着季节气温的变化而周期变化；每年的长假（五一、十一、春节）都会引起出行人数的大量增加。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427153759975.png" /></p>
+<p>循环变动 <strong>C</strong> 与季节变动的周期不同，循环变动通常以 <strong>若干年</strong> 为周期，在曲线图上表现为 <strong>波浪式</strong> 的周期变动。这种周期变动的特征表现为增加和减少 <strong>交替</strong> 出现，但是并不具 <strong>严格规则</strong> 的周期性连续变动。最典型的周期案例就是市场经济的商业周期和的整个国家的经济周期。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427154013293.png" /></p>
+<p>不规则变动 <strong>I</strong> 是由某些随机因素导致的数值变化，这些因素的作用是不可预知和没有规律性的，可以视为由于众多 <strong>偶然</strong> 因素对时间序列造成的影响（在回归中又被称为扰动项）。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427154055743.png" /></p>
+<p>以上四种变动就是时间序列数值变化的 <strong>分解</strong> 结果。</p>
+<p>有时这些变动会同时出现在一个时间序列里面，有时也可能只出现一种或几种，这是由引起各种变动的影响因素决定的。正是由于变动组合的不确定性，时间序列的数值变化才那么千变万化。</p>
+<p>四种变动与指标数值最终变动的关系可能是 <strong>叠加</strong> 关系，也可能是 <strong>乘积</strong> 关系。</p>
+<p>如果四种变动之间是相互独立的关系，那么叠加模型可以表示为：<span class="math inline">\(Y=T+S+C+I\)</span></p>
+<p>如果四种变动之间存在相互影响关系，那么应该使用乘积模型：<span class="math inline">\(Y=T \times S \times C \times I\)</span></p>
+<p>数据具有 <strong>年内的周期性时</strong> 才能使用时间序列分解，例如数据包含月份数据(周期为12)、季度数据(周期为4) ，如果 <strong>单纯</strong> 是年份数据则不行。</p>
+<p>在具体的时间序列图上，如果随着时间的推移，序列的季节 <strong>波动变得越来越大</strong> ，则反映各种变动之间的关系发生变化，建议使用乘积模型；反之，如果时间序列图的 <strong>波动保持恒定</strong>，则可以直接使用叠加模型；当然，如果不存在季节波动，则两种分解均可以。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427154703653.png" /></p>
+<h2 id="spss-操作">SPSS 操作</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427154826619.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427154938459.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427155014860.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427155048405.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427155251732.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427155406628.png" /></p>
+<h1 id="未来指标预测">未来指标预测</h1>
+<h2 id="指数平滑模型">指数平滑模型</h2>
+<h3 id="simple-模型">Simple 模型</h3>
+<p>不含 <strong>趋势</strong> 和 <strong>季节</strong> 成分，由过去数据 <strong>加权</strong> 所得，只能预测 <strong>1</strong> 期。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427160443250.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427160653727.png" /></p>
+<p>红色是预测的线。</p>
+<h3 id="霍特-布朗线性趋势模型">霍特 / 布朗线性趋势模型</h3>
+<p>含有 <strong>线性趋势</strong>、不含 <strong>季节</strong> 成分</p>
+<p>该方法包含一个预测方程和两个平滑方程（一个用于水平，另一个用于趋势）。原理不细讲。</p>
+<p>由式子不断递推所得。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427161415441.png" /></p>
+<h3 id="阻尼趋势模型">阻尼趋势模型</h3>
+<p>霍特线性趋势模型对对未来预测值过高，特别是对于长期预测。引入了一种 <strong>阻尼</strong> 效应，用来缓解较高的线性趋势。（比如人口、GDP）</p>
+<p><span class="math inline">\(\phi\)</span> 越小，阻力越大。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427161834051.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427161925157.png" /></p>
+<h3 id="简单季节性模型">简单季节性模型</h3>
+<p>不含 <strong>趋势</strong>，含 <strong>稳定季节成分</strong> 。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427162147223.png" /></p>
+<h3 id="温特加法模型">温特加法模型</h3>
+<p>含有 <strong>线性趋势</strong> 和 <strong>稳定季节成分</strong> （时间序列分解加法）。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427162434210.png" /></p>
+<h3 id="温特乘法模型">温特乘法模型</h3>
+<p>含有 <strong>线性趋势</strong> 和 <strong>不稳定季节成分</strong> （时间序列分解乘法）。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427162511905.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427162622987.png" /></p>
+<p>由于是乘法，认为不稳定，蓝色的线会波动大一点。</p>
+<p>SPSS 专家建模的一些问题，如果是预测可不用关注参数显著值，解释需要，但是有的时候已经给了最好的模型，显著值可能不佳。</p>
+<h2 id="一元时间序列分析模型">一元时间序列分析模型</h2>
+<h3 id="时间序列的平稳性">时间序列的平稳性</h3>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427163900337.png" /></p>
+<p>只有 b g 是平稳的。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427164249314.png" /></p>
+<h3 id="差分方程">差分方程</h3>
+<p>滞后项，之前 <span class="math inline">\(p\)</span> 个数据。</p>
+<p>将某个时间序列变量表示为该变量的 <strong>滞后项</strong>、 <strong>时间 t</strong> 和 <strong>其他变量</strong> 的函数，这样的一个函数方程被称为差分方程。</p>
+<p>扰动项没有一般说明默认为 白噪声 序列。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427165117945.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427165227078.png" /></p>
+<h3 id="滞后算子">滞后算子</h3>
+<p>是一种表达式写法，方便表示。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427165642561.png" /></p>
+<h3 id="arp-模型">AR(p) 模型</h3>
+<p>为预测，生成的模型。</p>
+<p>包含收 <strong>自身因素</strong> 影响较大的现象，对受 其他因素 影响不宜使用。</p>
+<p>需要模型 <strong>稳定</strong>，共有 <span class="math inline">\(p\)</span> 阶元素，由于模型（自回归模型）特性，具有 <strong>自相关</strong> 现象。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427170802064.png" /></p>
+<p>AR(q) 模型平稳的条件：（模长，解的长度大小）</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427172028993.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427172150223.png" /></p>
+<h3 id="maq-模型">MA(q) 模型</h3>
+<p>q 阶 <strong>移动平均</strong>，使用扰动项，使得均值较为平稳。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427190608642.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427191007976.png" /></p>
+<p>1 阶移动平均模型可以和无穷阶的自回归模型相互转换，但是需要模型中的参数少，所以还是要移动平均过程。</p>
+<h4 id="maq-平稳证明">MA(q) 平稳证明</h4>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427191346473.png" /></p>
+<h3 id="armap-q-模型">ARMA(p, q) 模型</h3>
+<p>无趋势和季节性。</p>
+<p>自回归移动平均模型，就是设法将自回归过程 AR 和移动平均过程 MA 结合起来，<strong>共同模拟</strong> 产生既有时间序列样本数据的那个随机过程的模型。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427191527084.png" /></p>
+<p>ARMA 模型的平稳性和自回归 AR 模型相关，MA 一定是平稳的。</p>
+<p>一般，我们可以通过观察时序图来判断时间序列是否平稳，当然，也有相应的假设检验方法能帮助我们对数据的平稳性进行检验。</p>
+<h3 id="acf-相关系数">ACF 相关系数</h3>
+<p>反映 <span class="math inline">\(x_t\)</span> 和 <span class="math inline">\(x_{t-s}\)</span> 之间的相关系数。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427192728250.png" /></p>
+<h3 id="pacf-偏自相关系数">PACF 偏自相关系数</h3>
+<p>用于衡量 <span class="math inline">\(x_t\)</span> 和 <span class="math inline">\(x_{t-s}\)</span> 之间剔除掉所有中间取值后的线性关系。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427193244049.png" /></p>
+<h3 id="arma-模型识别和估计">ARMA 模型识别和估计</h3>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427193402971.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427193422471.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427193520111.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427193731632.png" /></p>
+<p>通过图形识别 ARMA 模型的拖尾现象，但识别 <strong>阶数</strong> 较为困难，求解需要依赖于计算机。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427194029531.png" /></p>
+<h3 id="模型选择">模型选择</h3>
+<p>往往使用 BIC 准则。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427194444160.png" /></p>
+<p>原假设为残差为 0，p 值 大于 0.05 可接受。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427194827652.png" /></p>
+<h3 id="arima-模型">ARIMA 模型</h3>
+<p>差分自回归移动平均模型，通过差分，使得模型变得平稳。</p>
+<figure>
+<img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427195248970.png" alt="image-20210427195248970" /><figcaption>image-20210427195248970</figcaption>
+</figure>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427195226853.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427195340604.png" /></p>
+<h3 id="sarima-模型">SARIMA 模型</h3>
+<p>到目前为止，我们只关注非季节性数据和非季节性 ARIMA 模型。然而，ARIMA 模型也能够对广泛的季节数据进行建模。季节性ARIMA模型是通过在 ARIMA 模型中包含额外的季节性项而生成的，其形式如下：</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427195454598.png" /></p>
+<h3 id="arch-模型">ARCH 模型</h3>
+<p>自回归条件异方差模型，在现代高频金融时间序列中，数据经常出现波动性聚集的特点，但从长期来看数据是平稳的，即长期方差（无条件方差）是定值，但从短期来看方差是不稳定的，我们称这种异方差为条件异方差。传统的时间序列模型如ARMA模型识别不出来这一特征。ARCH 模型的实质是对扰动项进行建模。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428141452691.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428141718171.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428141944170.png" /></p>
+<h3 id="garch-模型">GARCH 模型</h3>
+<p>广义的 ARCH 模型。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428142348994.png" /></p>
+<p>使用 LM 检验 GARCH 效应，对 扰动项评分进行检验。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428142437533.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428142700532.png" /></p>
+<h1 id="灰色预测">灰色预测</h1>
+<p>灰色预测是对既含有已知信息又含有不确定信息的系统进行预测，就是对在一定范围内变化的、与 <strong>时间</strong>有关的灰色过程进行预测。</p>
+<p>灰色预测对原始数据进行生成处理来寻找系统变动的规律，并生成有较强 <strong>规律性</strong> 的数据序列，然后建立相应的 <strong>微分方程模型</strong>，从而预测事物未来发展趋势的状况。</p>
+<p>GM(1,1) （第一个 1 表示微分方程是<strong>一阶的</strong>，后面的 1 表示只有<strong>一个变量</strong>）是使用原始的离散非负数据列，通过一次 <strong>累加</strong> 生成削弱随机性的较有规律的新的离散数据列，然后通过建立微分方程模型，得到在离散点处的解经过累减生成的原始数据的近似估计值，从而预测原始数据的后续发展。</p>
+<p>AGO 序列累加数据列，<span class="math inline">\(x^{(1)}(m)=\sum\limits^m_{i=0}{x^{(0)}(i)}\)</span>, <span class="math inline">\(x^{(0)}\)</span> 为原数据列，<span class="math inline">\(z^{(1)}\)</span> 为紧邻均值生成序列。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428164949228.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428165408638.png" /></p>
+<h2 id="ols-回归原理复习">OLS 回归原理复习</h2>
+<p>OLS 最小二乘法。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428165708350.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428165936523.png" /></p>
+<p>要求 <span class="math inline">\(X^TX\)</span> 可逆，列满秩，还可以推导到多系数的情况。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428170117415.png" /></p>
+<p>如果 <span class="math inline">\(X^TX\)</span> 不可逆，要么增加样本，要么减少系数（岭回归思想，$ X^TX+I$ 一定可逆）</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428170954491.png" /></p>
+<p>灰建模的初衷是对 <strong>数列</strong> 建立 <strong>近似</strong> 的 <strong>微分方程模型</strong> ，但是由于微分方程只适合连续可微函数, 而时间序列数据非连续，更谈不上可微性，因此灰色预测建模得到的是近似微分方程，称之为灰微分方程。</p>
+<p>一阶微分方程求解知识（高数）：</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428171747866.png" /></p>
+<p>所以可得</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428171954961.png" /></p>
+<p>所以要求数据具有准指数规律。</p>
+<h2 id="准指数规律检验及评价">准指数规律检验及评价</h2>
+<p>关注 级比 和 光滑比。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428182236623.png" /></p>
+<p>发展系数 <span class="math inline">\(a\)</span> 越小预测的越精确。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428182411169.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428183036016.png" /></p>
+<h2 id="gm11模型的拓展">GM(1,1)模型的拓展</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428183748156.png" /></p>
+<p>灰色预测使用：</p>
+<ol type="1">
+<li>数据是以年份度量的非负数据（如果是月份或者季度数据一定要用上时间序列模型）</li>
+<li>数据能经过准指数规律的检验（除了前两期外，后面至少90%的期数的光滑比要低于0.5）</li>
+<li>数据的期数较短且和其他数据之间的关联性不强（小于等于10，也不能太短了，比如只有3期数据），要是数据期数较长，一般用传统的时间序列模型比较合适</li>
+</ol>
+<h2 id="代码">代码</h2>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[result, x0_hat, relative_residuals, eta]</span> = <span class="title">gm11</span><span class="params">(x0, predict_num)</span></span></span><br><span class="line">    <span class="comment">% 函数作用：使用传统的GM(1,1)模型对数据进行预测</span></span><br><span class="line">    <span class="comment">%     x0：要预测的原始数据</span></span><br><span class="line">    <span class="comment">%     predict_num： 向后预测的期数</span></span><br><span class="line">    <span class="comment">% 输出变量：</span></span><br><span class="line">    <span class="comment">%     result：预测值</span></span><br><span class="line">    <span class="comment">%     x0_hat：对原始数据的拟合值</span></span><br><span class="line">    <span class="comment">%     relative_residuals： 对模型进行评价时计算得到的相对残差</span></span><br><span class="line">    <span class="comment">%     eta： 对模型进行评价时计算得到的级比偏差</span></span><br><span class="line">    n = <span class="built_in">length</span>(x0);</span><br><span class="line">    x1 = cumsum(x0);</span><br><span class="line">    z1 = (x1(<span class="number">1</span>:<span class="keyword">end</span><span class="number">-1</span>) + x1(<span class="number">2</span>:<span class="keyword">end</span>)) / <span class="number">2</span>;</span><br><span class="line">    y = x0(<span class="number">2</span>:<span class="keyword">end</span>);</span><br><span class="line">    x = z1;</span><br><span class="line">    <span class="comment">% OLS 最小二乘法</span></span><br><span class="line">    k = ((n - <span class="number">1</span>) * sum(x .* y) - sum(x) * sum(y)) / ((n - <span class="number">1</span>) * sum(x .* x) - sum(x) * sum(x));</span><br><span class="line">    b = (sum(x .* x) * sum(y) - sum(x) * sum(x .* y)) / ((n - <span class="number">1</span>) * sum(x .* x) - sum(x) * sum(x));</span><br><span class="line">    <span class="comment">% -a就是发展系数,  b就是灰作用量</span></span><br><span class="line">    a = -k;</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;现在进行GM(1,1)预测的原始数据是: &#x27;</span>)</span><br><span class="line">    <span class="built_in">disp</span>(mat2str(x0&#x27;))</span><br><span class="line">    <span class="built_in">disp</span>([<span class="string">&#x27;最小二乘法拟合得到的发展系数为&#x27;</span> num2str(-a) <span class="string">&#x27;，灰作用量是&#x27;</span> num2str(b)])</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;***************分割线***************&#x27;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment">% 拟合值计算</span></span><br><span class="line">    x0_hat = <span class="built_in">zeros</span>(n, <span class="number">1</span>);</span><br><span class="line">    x0_hat(<span class="number">1</span>) = x0(<span class="number">1</span>);</span><br><span class="line">    <span class="keyword">for</span> m = <span class="number">1</span>:n<span class="number">-1</span></span><br><span class="line">        x0_hat(m+<span class="number">1</span>) = (<span class="number">1</span> - <span class="built_in">exp</span>(a)) * (x0(<span class="number">1</span>) - b/a) * <span class="built_in">exp</span>(-a*m);</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">% 保存预测值</span></span><br><span class="line">    result = <span class="built_in">zeros</span>(predict_num, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>:predict_num</span><br><span class="line">        result(<span class="built_in">i</span>) = (<span class="number">1</span> - <span class="built_in">exp</span>(a)) * (x0(<span class="number">1</span>) - b/a) * <span class="built_in">exp</span>(-a * (n+<span class="built_in">i</span><span class="number">-1</span>)); <span class="comment">% 带入公式直接计算</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">% 计算绝对残差和相对残差</span></span><br><span class="line">    absolute_residuals = x0(<span class="number">2</span>:<span class="keyword">end</span>) - x0_hat(<span class="number">2</span>:<span class="keyword">end</span>);</span><br><span class="line">    relative_residuals = <span class="built_in">abs</span>(absolute_residuals) ./ x0(<span class="number">2</span>:<span class="keyword">end</span>);</span><br><span class="line">    </span><br><span class="line">    <span class="comment">% 计算级比和级比偏差</span></span><br><span class="line">    class_ratio = x0(<span class="number">2</span>:<span class="keyword">end</span>) ./ x0(<span class="number">1</span>:<span class="keyword">end</span><span class="number">-1</span>);  <span class="comment">% 计算级比 sigma(k) = x0(k) / x0(k-1)</span></span><br><span class="line">    eta = <span class="built_in">abs</span>(<span class="number">1</span>-(<span class="number">1</span><span class="number">-0.5</span>*a)/(<span class="number">1</span>+<span class="number">0.5</span>*a)*(<span class="number">1.</span>/class_ratio));  <span class="comment">% 计算级比偏差</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[result]</span> = <span class="title">new_gm11</span><span class="params">(x0, predict_num)</span></span></span><br><span class="line">    <span class="comment">% 函数作用：使用新信息的GM(1,1)模型对数据进行预测</span></span><br><span class="line">    <span class="comment">% 输入变量</span></span><br><span class="line">    <span class="comment">%     x0：要预测的原始数据</span></span><br><span class="line">    <span class="comment">%     predict_num： 向后预测的期数</span></span><br><span class="line">    <span class="comment">% 输出变量</span></span><br><span class="line">    <span class="comment">%     result：预测值</span></span><br><span class="line">    result = <span class="built_in">zeros</span>(predict_num, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>:predict_num</span><br><span class="line">    	<span class="comment">% 不断使用新的预测值加入再去预测</span></span><br><span class="line">    	result(<span class="built_in">i</span>) = gm11(x0, <span class="number">1</span>);</span><br><span class="line">    	x0 = [x0; result(<span class="built_in">i</span>)];</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="params">[result]</span> = <span class="title">metabolism_gm11</span><span class="params">(x0, predict_num)</span></span></span><br><span class="line">    <span class="comment">% 函数作用：使用新陈代谢的GM(1,1)模型对数据进行预测</span></span><br><span class="line">    <span class="comment">% 输入变量</span></span><br><span class="line">    <span class="comment">%     x0：要预测的原始数据</span></span><br><span class="line">    <span class="comment">%     predict_num： 向后预测的期数</span></span><br><span class="line">    <span class="comment">% 输出变量</span></span><br><span class="line">    <span class="comment">%     result：预测值</span></span><br><span class="line">    result = <span class="built_in">zeros</span>(predict_num, <span class="number">1</span>);</span><br><span class="line">    <span class="keyword">for</span> <span class="built_in">i</span> = <span class="number">1</span>:predict_num  </span><br><span class="line">        result(<span class="built_in">i</span>) = gm11(x0, <span class="number">1</span>);  <span class="comment">% 将预测一期的结果保存到result中</span></span><br><span class="line">        x0 = [x0(<span class="number">2</span>:<span class="keyword">end</span>); result(<span class="built_in">i</span>)];  <span class="comment">% 更新x0向量，此时x0多了新的预测信息，并且删除了最开始的那个向量，队列轮转</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">year = [<span class="number">1995</span>:<span class="number">1</span>:<span class="number">2004</span>]&#x27;;</span><br><span class="line">x0 = [<span class="number">174</span>, <span class="number">179</span>, <span class="number">183</span>, <span class="number">189</span>, <span class="number">207</span>, <span class="number">234</span>, <span class="number">220.5</span>, <span class="number">256</span>, <span class="number">270</span>, <span class="number">285</span>]&#x27;;  <span class="comment">% 原始数据序列</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">figure</span>(<span class="number">1</span>)</span><br><span class="line"><span class="built_in">plot</span>(year, x0, <span class="string">&#x27;o-&#x27;</span>)</span><br><span class="line">grid on</span><br><span class="line">set(gca, <span class="string">&#x27;xtick&#x27;</span>, year(<span class="number">1</span>:<span class="number">1</span>:<span class="keyword">end</span>))</span><br><span class="line">xlabel(<span class="string">&#x27;年份&#x27;</span>)</span><br><span class="line">ylabel(<span class="string">&#x27;排污总量&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> sum(x0 &lt; <span class="number">0</span>) &gt; <span class="number">0</span></span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;灰色预测的时间序列中不能有负数&#x27;</span>)</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">n = <span class="built_in">length</span>(x0);</span><br><span class="line"><span class="built_in">disp</span>([<span class="string">&#x27;原始数据的长度为&#x27;</span> num2str(n)])</span><br><span class="line"><span class="keyword">if</span> n &lt;= <span class="number">3</span></span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;数据量太小&#x27;</span>)</span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">% 数据太多时提示可考虑使用其他方法（不报错）</span></span><br><span class="line"><span class="keyword">if</span> n &gt; <span class="number">10</span></span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;数据量多，一定要考虑使用其他的方法，例如ARIMA，指数平滑等&#x27;</span>)</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27;------------------------------------------------------------&#x27;</span>)</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27;准指数规律检验&#x27;</span>)</span><br><span class="line">x1 = cumsum(x0); <span class="comment">% 生成 AGO 序列</span></span><br><span class="line">rho = x0(<span class="number">2</span>:<span class="keyword">end</span>) ./ x1(<span class="number">1</span>:<span class="keyword">end</span><span class="number">-1</span>); <span class="comment">% 计算光滑度rho(k) = x0(k) / x1(k-1)</span></span><br><span class="line"><span class="built_in">figure</span>(<span class="number">2</span>)</span><br><span class="line"><span class="built_in">plot</span>(year(<span class="number">2</span>:<span class="keyword">end</span>), rho, <span class="string">&#x27;o-&#x27;</span>, [year(<span class="number">2</span>), year(<span class="keyword">end</span>)], [<span class="number">0.5</span>, <span class="number">0.5</span>], <span class="string">&#x27;-&#x27;</span>) </span><br><span class="line">grid on</span><br><span class="line">text(year(<span class="keyword">end</span><span class="number">-1</span>) + <span class="number">0.2</span>, <span class="number">0.55</span>, <span class="string">&#x27;临界线&#x27;</span>)</span><br><span class="line">set(gca, <span class="string">&#x27;xtick&#x27;</span>, year(<span class="number">2</span>:<span class="number">1</span>:<span class="keyword">end</span>))</span><br><span class="line">xlabel(<span class="string">&#x27;年份&#x27;</span>)</span><br><span class="line">ylabel(<span class="string">&#x27;原始数据的光滑度&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">disp</span>([<span class="string">&#x27;指标1：光滑比小于0.5的数据占比为&#x27;</span> num2str(<span class="number">100</span> * sum(rho&lt; <span class="number">0.5</span>) / (n - <span class="number">1</span>)) <span class="string">&#x27;%&#x27;</span>])</span><br><span class="line"><span class="built_in">disp</span>([<span class="string">&#x27;指标2：除去前两个时期外，光滑比小于0.5的数据占比为&#x27;</span> num2str(<span class="number">100</span> * sum(rho(<span class="number">3</span>:<span class="keyword">end</span>) &lt; <span class="number">0.5</span>) / (n<span class="number">-3</span>)) <span class="string">&#x27;%&#x27;</span>])</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27;参考标准：指标1一般要大于60%, 指标2要大于90%&#x27;</span>)</span><br><span class="line">Judge = input(<span class="string">&#x27;你认为可以通过准指数规律的检验吗？可以通过请输入1，不能请输入0：&#x27;</span>);</span><br><span class="line"><span class="keyword">if</span> Judge == <span class="number">0</span></span><br><span class="line">    <span class="keyword">return</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> n &lt;= <span class="number">4</span></span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;数据只有4期，因此我们直接将三种方法的结果求平均即可~&#x27;</span>)</span><br><span class="line">    predict_num = input(<span class="string">&#x27;请输入你要往后面预测的期数： &#x27;</span>);</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27; &#x27;</span>)</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;***下面是传统的GM(1,1)模型预测的详细过程***&#x27;</span>)</span><br><span class="line">    [result1, x0_hat, relative_residuals, eta] = gm11(x0, predict_num</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27; &#x27;</span>)</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;***下面是进行新信息的GM(1,1)模型预测的详细过程***&#x27;</span>)</span><br><span class="line">    result2 = new_gm11(x0, predict_num);</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27; &#x27;</span>)</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;***下面是进行新陈代谢的GM(1,1)模型预测的详细过程***&#x27;</span>)</span><br><span class="line">    result3 = metabolism_gm11(x0, predict_num);</span><br><span class="line">    result = (result1 + result2 + result3) / <span class="number">3</span>;</span><br><span class="line">    result</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;因为原数据的期数大于4，所以我们可以将数据组分为训练组和试验组&#x27;</span>)</span><br><span class="line">    <span class="keyword">if</span> n &gt; <span class="number">7</span></span><br><span class="line">        test_num = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    	test_num = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    train_x0 = x0(<span class="number">1</span>:<span class="keyword">end</span>-test_num);</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;训练数据是: &#x27;</span>)</span><br><span class="line">    <span class="built_in">disp</span>(mat2str(train_x0&#x27;))</span><br><span class="line">    test_x0 = x0(<span class="keyword">end</span>-test_num+<span class="number">1</span>:<span class="keyword">end</span>);</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;试验数据是: &#x27;</span>)</span><br><span class="line">    <span class="built_in">disp</span>(mat2str(test_x0&#x27;))</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;------------------------------------------------------------&#x27;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27; &#x27;</span>)</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;***下面是传统的GM(1,1)模型预测的详细过程***&#x27;</span>)</span><br><span class="line">    result1 = gm11(train_x0, test_num);</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27; &#x27;</span>)</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;***下面是进行新信息的GM(1,1)模型预测的详细过程***&#x27;</span>)</span><br><span class="line">    result2 = new_gm11(train_x0, test_num);</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27; &#x27;</span>)</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;***下面是进行新陈代谢的GM(1,1)模型预测的详细过程***&#x27;</span>)</span><br><span class="line">    result3 = metabolism_gm11(train_x0, test_num);</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27; &#x27;</span>)</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;------------------------------------------------------------&#x27;</span>)</span><br><span class="line">    test_year = year(<span class="keyword">end</span>-test_num+<span class="number">1</span>:<span class="keyword">end</span>);</span><br><span class="line">    <span class="built_in">figure</span>(<span class="number">3</span>)</span><br><span class="line">    <span class="built_in">plot</span>(test_year,test_x0,<span class="string">&#x27;o-&#x27;</span>,test_year,result1,<span class="string">&#x27;*-&#x27;</span>,test_year,result2,<span class="string">&#x27;+-&#x27;</span>,test_year,result3,<span class="string">&#x27;x-&#x27;</span>)</span><br><span class="line">    grid on</span><br><span class="line">    set(gca, <span class="string">&#x27;xtick&#x27;</span>, year(<span class="keyword">end</span>-test_num+<span class="number">1</span>):<span class="number">1</span>:year(<span class="keyword">end</span>))</span><br><span class="line">    <span class="built_in">legend</span>(<span class="string">&#x27;试验组的真实数据&#x27;</span>, <span class="string">&#x27;传统GM(1,1)预测结果&#x27;</span>, <span class="string">&#x27;新信息GM(1,1)预测结果&#x27;</span>, <span class="string">&#x27;新陈代谢GM(1,1)预测结果&#x27;</span>)</span><br><span class="line">    xlabel(<span class="string">&#x27;年份&#x27;</span>)</span><br><span class="line">    ylabel(<span class="string">&#x27;排污总量&#x27;</span>)</span><br><span class="line">    </span><br><span class="line">    SSE1 = sum((test_x0-result1).^<span class="number">2</span>);</span><br><span class="line">    SSE2 = sum((test_x0-result2).^<span class="number">2</span>);</span><br><span class="line">    SSE3 = sum((test_x0-result3).^<span class="number">2</span>);</span><br><span class="line">    <span class="built_in">disp</span>([<span class="string">&#x27;传统GM(1,1)对于试验组预测的误差平方和为&#x27;</span> num2str(SSE1)])</span><br><span class="line">    <span class="built_in">disp</span>([<span class="string">&#x27;新信息GM(1,1)对于试验组预测的误差平方和为&#x27;</span> num2str(SSE2)])</span><br><span class="line">    <span class="built_in">disp</span>([<span class="string">&#x27;新陈代谢GM(1,1)对于试验组预测的误差平方和为&#x27;</span> num2str(SSE3)])</span><br><span class="line">    <span class="keyword">if</span> SSE1 &lt; SSE2 &amp; SSE1 &lt; SSE3</span><br><span class="line">    	choose = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">elseif</span> SSE2 &lt; SSE3</span><br><span class="line">    	choose = <span class="number">2</span>;</span><br><span class="line">   	<span class="keyword">else</span></span><br><span class="line">   		choose = <span class="number">3</span>;</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    </span><br><span class="line">    Model = &#123;<span class="string">&#x27;传统GM(1,1)模型&#x27;</span>, <span class="string">&#x27;新信息GM(1,1)模型&#x27;</span>, <span class="string">&#x27;新陈代谢GM(1,1)模型&#x27;</span>&#125;;</span><br><span class="line">    <span class="built_in">disp</span>([<span class="string">&#x27;因为&#x27;</span>,Model(choose),<span class="string">&#x27;的误差平方和最小，所以我们应该选择其进行预测&#x27;</span>])</span><br><span class="line">    <span class="built_in">disp</span>(<span class="string">&#x27;------------------------------------------------------------&#x27;</span>)</span><br><span class="line">    predict_num = input(<span class="string">&#x27;请输入你要往后面预测的期数： &#x27;</span>);</span><br><span class="line">    [result, x0_hat, relative_residuals, eta] = gm11(x0, predict_num);</span><br><span class="line">    <span class="keyword">if</span> choose == <span class="number">2</span></span><br><span class="line">        result = new_gm11(x0, predict_num);</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">if</span> choose == <span class="number">3</span></span><br><span class="line">        result = metabolism_gm11(x0, predict_num);</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    result</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">figure</span>(<span class="number">4</span>)</span><br><span class="line">subplot(<span class="number">2</span>, <span class="number">1</span>, <span class="number">1</span>)</span><br><span class="line"><span class="built_in">plot</span>(year(<span class="number">2</span>:<span class="keyword">end</span>), relative_residuals, <span class="string">&#x27;*-&#x27;</span>) </span><br><span class="line">grid on</span><br><span class="line"><span class="built_in">legend</span>(<span class="string">&#x27;相对残差&#x27;</span>) </span><br><span class="line">xlabel(<span class="string">&#x27;年份&#x27;</span>)</span><br><span class="line">set(gca,<span class="string">&#x27;xtick&#x27;</span>,year(<span class="number">2</span>:<span class="number">1</span>:<span class="keyword">end</span>))</span><br><span class="line">subplot(<span class="number">2</span>, <span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="built_in">plot</span>(year(<span class="number">2</span>:<span class="keyword">end</span>), eta, <span class="string">&#x27;o-&#x27;</span>)</span><br><span class="line">grid on</span><br><span class="line"><span class="built_in">legend</span>(<span class="string">&#x27;级比偏差&#x27;</span>) </span><br><span class="line">xlabel(<span class="string">&#x27;年份&#x27;</span>)</span><br><span class="line">set(gca, <span class="string">&#x27;xtick&#x27;</span>, year(<span class="number">2</span>:<span class="number">1</span>:<span class="keyword">end</span>))</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27; &#x27;</span>)</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27;****下面将输出对原数据拟合的评价结果***&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">% &lt; 0.1 不错 &lt; 0.2 可接受</span></span><br><span class="line">average_relative_residuals = <span class="built_in">mean</span>(relative_residuals);  <span class="comment">% 计算平均相对残差 mean函数用来均值</span></span><br><span class="line"><span class="built_in">disp</span>([<span class="string">&#x27;平均相对残差为&#x27;</span> num2str(average_relative_residuals)])</span><br><span class="line">average_eta = <span class="built_in">mean</span>(eta);   <span class="comment">% 计算平均级比偏差</span></span><br><span class="line"><span class="built_in">disp</span>([<span class="string">&#x27;平均级比偏差为&#x27;</span> num2str(average_eta)])</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27; &#x27;</span>)</span><br><span class="line"><span class="built_in">disp</span>(<span class="string">&#x27;------------------------------------------------------------&#x27;</span>)</span><br><span class="line"></span><br><span class="line"><span class="built_in">figure</span>(<span class="number">5</span>)</span><br><span class="line"><span class="built_in">plot</span>(year, x0, <span class="string">&#x27;-o&#x27;</span>, year, x0_hat, <span class="string">&#x27;-*m&#x27;</span>, year(<span class="keyword">end</span>)+<span class="number">1</span>:year(<span class="keyword">end</span>)+predict_num, result, <span class="string">&#x27;-*b&#x27;</span>)</span><br><span class="line"><span class="built_in">hold</span> on</span><br><span class="line"><span class="built_in">plot</span>([year(<span class="keyword">end</span>), year(<span class="keyword">end</span>)+<span class="number">1</span>], [x0(<span class="keyword">end</span>), result(<span class="number">1</span>)], <span class="string">&#x27;-*b&#x27;</span>)</span><br><span class="line"><span class="built_in">legend</span>(<span class="string">&#x27;原始数据&#x27;</span>,<span class="string">&#x27;拟合数据&#x27;</span>,<span class="string">&#x27;预测数据&#x27;</span>)</span><br><span class="line">set(gca, <span class="string">&#x27;xtick&#x27;</span>, [year(<span class="number">1</span>):<span class="number">1</span>:year(<span class="keyword">end</span>)+predict_num])</span><br><span class="line">xlabel(<span class="string">&#x27;年份&#x27;</span>)</span><br><span class="line">ylabel(<span class="string">&#x27;排污总量&#x27;</span>)</span><br></pre></td></tr></table></figure>
+<h1 id="例题演示">例题演示</h1>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210427200049434.png" /></p>
+<h2 id="spss-操作-1">SPSS 操作</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210514210415804.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210514210603197.png" /></p>
+<h2 id="例题1.-销售数据预测">例题1. 销售数据预测</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428105409192.png" /></p>
+<p>数据为季度数据（有四个周期），从图中看出也有季节性波动，即第二季度的销量较高，第四季度较低。</p>
+<p>根据时间序列图可知数据不平稳，有向上的趋势。</p>
+<p>SPSS 的专家建模给出的最合适的模型是温特加法模型，意味着原时间序列数据含有线性趋势和稳定的季节成分，我们可以使用加法时间序列分解。</p>
+<p>SPSS 也会对发现的异常值使用序列平均值来替代。</p>
+<p>注：</p>
+<ul>
+<li>预测值和拟合值是不相同的，预测值是将样本外年份的数据带入模型计算得到的，而拟合值是将样本的年份重新带入模型计算得到。</li>
+<li>保留残差的ACF和PACF图形可以帮助我们判断残差是否为白噪声，即该时间序列是否能被模型识别完全。</li>
+<li>一般比较两个模型的好坏，我们可以使用平稳的R方（文档上翻译成了固定的R方）或者标准化BIC（BIC准则），这两个指标既考虑了拟合的好坏，又考虑了模型的复杂度</li>
+<li>R方可用来反映线性模型拟合的好坏，越接近于1拟合的越准确</li>
+</ul>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428112219505.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428112250580.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428112351973.png" /></p>
+<h2 id="例题2.-人口数据预测">例题2. 人口数据预测</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428112742127.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428112800341.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428130305431.png" /></p>
+<h2 id="例题3.-上证指数预测">例题3. 上证指数预测</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428130416367.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428130446738.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428130528074.png" /></p>
+<p>剔除异常值后进行预测：</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428130748041.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428130820019.png" /></p>
+<h2 id="例题4.-gdp增速预测">例题4. GDP增速预测</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428131014195.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428131052801.png" /></p>
+<p>预测 <strong>两要</strong>：一要结合背景；二要合理假设，预测 <strong>两不要</strong>：不要硬套模型；不要不做解释</p>
+<p>GDP 还受到了国内政策和其他社会因素的影响。</p>
+<h2 id="例题5.-深成b指时间序列预测">例题5. 深成B指时间序列预测</h2>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428150820881.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428150845208.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428150947333.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428151022241.png" /></p>
+<p>太多的滞后项会增加预测的 <strong>误差</strong> ，太少的滞后项又会 <strong>遗失</strong> 部分相关信息。经验和理论知识通常是用来决定滞后项阶数的最好方式，然而，依然存在着一些准则帮助我们确定滞后的阶数。为了确定哪个模型拟合效果最好，我们分别估计出了这四种模型，并给出了对应的AIC和BIC值，我们认为AIC与BIC值较小，模型拟合效果较好。</p>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>AIC</th>
+<th>BIC</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Model1：ARMA（3,3）</td>
+<td>3575.15</td>
+<td>3614.903</td>
+</tr>
+<tr class="even">
+<td>Model2：ARMA（8,8）</td>
+<td>3567.47</td>
+<td>3656.915</td>
+</tr>
+<tr class="odd">
+<td>Model3：ARMA（3,8）</td>
+<td>3576.66</td>
+<td>3641.258</td>
+</tr>
+<tr class="even">
+<td>Model4：ARMA（8,3）</td>
+<td>3575.39</td>
+<td>3639.992</td>
+</tr>
+</tbody>
+</table>
+<p>这四个模型中应选取Model1，即ARMA（3,3）模型。此时，AIC值和BIC值的平均值最小。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428151626110.png" /></p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428151730932.png" /></p>
+<p>检验残差是否为白噪声，使用 Ljung‐Box Q 检验，来检验ARMA模型的有效性，滞后12项的检验值的P值大于0.05，在5%的显著性水平下并不能拒绝原假设。故可以认为通过白噪声检验，即我们认为回归得到的残差不存在较明显的相关性，因此模型有效性较好。</p>
+<p>接下来再用LM检验是否存在 GARCH 误差。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428151857264.png" /></p>
+<p>再通过 GARCH 调整参数，选择使用带有GARCH(1,1) 且 <span class="math inline">\(v_t\)</span> 服从t分布的扰动项的 ARMA(3,3) 模型进行估计。</p>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210428152359223.png" /></p>
+<figure class="highlight stata"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">insheet</span> using <span class="string">&quot;Bindex.csv&quot;</span></span><br><span class="line"><span class="keyword">gen</span> datevar = <span class="built_in">date</span>(date, <span class="string">&quot;YMD&quot;</span>)</span><br><span class="line"><span class="keyword">format</span> datevar %td</span><br><span class="line"><span class="keyword">label</span> variable datevar <span class="string">&quot;日期&quot;</span></span><br><span class="line"><span class="keyword">tsset</span> datevar</span><br><span class="line"><span class="keyword">gen</span> time = _n <span class="comment">// 系统记录到后台的观测值的个数</span></span><br><span class="line"><span class="keyword">tsset</span> time</span><br><span class="line"></span><br><span class="line"><span class="keyword">line</span> index datevar</span><br><span class="line"><span class="keyword">gen</span> r = 100 * (index - <span class="keyword">L</span>.index) / <span class="keyword">L</span>.index <span class="comment">// L 为 lag 滞后项的缩写</span></span><br><span class="line"><span class="keyword">summarize</span> r</span><br><span class="line"><span class="keyword">line</span> r datevar</span><br><span class="line"></span><br><span class="line"><span class="comment">// ADF PADF 检测</span></span><br><span class="line"><span class="keyword">dfuller</span> r</span><br><span class="line"><span class="keyword">ac</span> r,lags(20) <span class="comment">// 自相关系数图</span></span><br><span class="line"><span class="keyword">pac</span> r,lags(20) </span><br><span class="line"></span><br><span class="line"><span class="keyword">set</span> matsize 1500</span><br><span class="line"><span class="keyword">arima</span> r,<span class="keyword">arima</span>(3,0,3)   <span class="comment">// 用ARIMA(3,0,3)模型对r进行估计</span></span><br><span class="line"><span class="keyword">estat</span> ic   <span class="comment">// 得到AIC和BIC，用于选择合适的模型（选小原则）</span></span><br><span class="line"><span class="keyword">arima</span> r,<span class="keyword">arima</span>(8,0,8)</span><br><span class="line"><span class="keyword">estat</span> ic</span><br><span class="line"><span class="keyword">arima</span> r,<span class="keyword">arima</span>(3,0,8)</span><br><span class="line"><span class="keyword">estat</span> ic</span><br><span class="line"><span class="keyword">arima</span> r,<span class="keyword">arima</span>(8,0,3)</span><br><span class="line"><span class="keyword">estat</span> ic</span><br><span class="line"></span><br><span class="line"><span class="comment">// 残差分布直方图</span></span><br><span class="line"><span class="keyword">arima</span> r,<span class="keyword">arima</span>(3,0,3)</span><br><span class="line"><span class="keyword">predict</span> residess, residuals</span><br><span class="line"><span class="keyword">hist</span> residess,norm freq</span><br><span class="line"></span><br><span class="line"><span class="comment">// 残差白噪声序列，检验方法为Q检验</span></span><br><span class="line"><span class="keyword">wntestq</span> residess, lag(12)</span><br><span class="line"><span class="keyword">gen</span> ressq = residess^2</span><br><span class="line"><span class="keyword">wntestq</span> ressq, lag(12)</span><br><span class="line"></span><br><span class="line"><span class="comment">// LM检验：是否存在ARCH误差</span></span><br><span class="line"><span class="keyword">reg</span> ressq <span class="keyword">l</span>.ressq l2.ressq l3.ressq l4.ressq l5.ressq</span><br><span class="line"><span class="keyword">gen</span> LM_STAT=<span class="built_in">e</span>(<span class="keyword">N</span>)*<span class="built_in">e</span>(r2) <span class="comment">// 计算LM统计量</span></span><br><span class="line"><span class="keyword">display</span> LM_STAT</span><br><span class="line"><span class="keyword">display</span> chiprob(<span class="built_in">e</span>(df_m),LM_STAT) <span class="comment">// 计算 p 值</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 利用AIC BIC选择合适的模型进行估计 </span></span><br><span class="line"><span class="comment">// 注意：扰动项的分布在金融数据中常服从t分布</span></span><br><span class="line"><span class="comment">// 正态分布下GARCH(1,1)估计</span></span><br><span class="line"><span class="keyword">arch</span> r,<span class="keyword">arima</span>(3 0 3) <span class="keyword">arch</span>(1) garch(1)</span><br><span class="line"><span class="keyword">estat</span> ic</span><br><span class="line"><span class="comment">// t分布下GARCH(1,1)估计</span></span><br><span class="line"><span class="keyword">arch</span> r,<span class="keyword">arima</span>(3 0 3) <span class="keyword">arch</span>(1) garch(1) distribution(t 3)  <span class="comment">// 自由度为3的t分布</span></span><br><span class="line"><span class="keyword">estat</span> ic</span><br><span class="line"><span class="keyword">arch</span> r,<span class="keyword">arima</span>(3 0 3) <span class="keyword">arch</span>(2) garch(2)</span><br><span class="line"><span class="keyword">estat</span> ic</span><br><span class="line"><span class="keyword">arch</span> r,<span class="keyword">arima</span>(3 0 3) <span class="keyword">arch</span>(2) garch(2) distribution(t 3)</span><br><span class="line"><span class="keyword">estat</span> ic</span><br><span class="line"></span><br><span class="line"><span class="comment">// 得到拟合结果，并进行预测</span></span><br><span class="line"><span class="keyword">arch</span> r,<span class="keyword">arima</span>(3 0 3) <span class="keyword">arch</span>(1) garch(1) distribution(t 3)</span><br><span class="line"><span class="keyword">tsappend</span>, add(10)  <span class="comment">// 将时间延长10期</span></span><br><span class="line"><span class="keyword">predict</span> result <span class="comment">// 对数据进行预测</span></span><br><span class="line"><span class="keyword">tsline</span> result r, legend(<span class="keyword">label</span>(1 <span class="string">&quot;预测值&quot;</span>)  <span class="keyword">label</span>(2 <span class="string">&quot;真实值&quot;</span>))</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/blog/tags/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1/" rel="tag"># 数学建模</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E6%95%B0%E6%A8%A1%E5%9F%BA%E7%A1%80/" rel="prev" title="数学建模-数模基础">
+                  <i class="fa fa-chevron-left"></i> 数学建模-数模基础
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/05/14/%E6%95%B0%E5%AD%A6%E5%BB%BA%E6%A8%A1-%E8%AF%84%E4%BB%B7%E7%B1%BB%E9%97%AE%E9%A2%98/" rel="next" title="数学建模-评价类问题">
+                  数学建模-评价类问题 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hauk</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/blog/js/utils.js"></script><script src="/blog/js/motion.js"></script><script src="/blog/js/schemes/muse.js"></script><script src="/blog/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'none'
+      },
+      options: {
+        renderActions: {
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/tex-mml-chtml.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.typesetClear();
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+
+
+</body>
+</html>
