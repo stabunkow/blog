@@ -32,6 +32,7 @@ tag: [OJ, haizeiOJ, 线段树]
 
 ```cpp
 #include <bits/stdc++.h>
+
 using namespace std;
 
 #define MAX_N 500000
@@ -55,11 +56,11 @@ int val[MAX_N + 5];
 // 用途1：向上更新
 // 用途2：在 query 中
 void UP(int a, int b, int c) {
-	SUM(a) = SUM(b) + SUM(c);
+    SUM(a) = SUM(b) + SUM(c);
     LMAX(a) = max(LMAX(b), SUM(b) + LMAX(c));
     RMAX(a) = max(RMAX(c), SUM(c) + RMAX(b));
     INMAX(a) = max(max(INMAX(b), INMAX(c)), RMAX(b) + LMAX(c));
-	return ;
+    return ;
 }
 
 void build_tree(int ind, int l, int r) {

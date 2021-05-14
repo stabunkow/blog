@@ -34,6 +34,7 @@ tag: [OJ, haizeiOJ, 线段树]
 
 ```cpp
 #include <bits/stdc++.h>
+
 using namespace std;
 
 #define MAX_N 100000

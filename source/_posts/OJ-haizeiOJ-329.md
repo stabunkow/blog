@@ -37,6 +37,7 @@ $a$ 数组是 $X$ 数组的前缀和数组
 
 ```cpp
 #include <bits/stdc++.h>
+
 using namespace std;
 
 #define MAX_N 100000
