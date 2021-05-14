@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/blog/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/blog/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/blog/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/blog/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/blog/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.2/css/all.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css">
+
+<script class="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"stabunkow.github.io","root":"/blog/","images":"/blog/images","scheme":"Muse","version":"8.2.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}};
+  </script>
+<meta name="description" content="加强的整数问题  输入 12345 21 5 3 2 4C 1 5 1Q 1 5 输出 120 题解 原数组：\({a_1, a_2,a_3,....,a_n}\) 前缀和数组：\(S_i&#x3D;\sum\limits_{k&#x3D;1}^{k&#x3D;i}{a_i}, a_i&#x3D;S_i-S_{i-1}\) 差分数组：\(X_i&#x3D;a_i-a_{i-1}\) \(a\) 数组是 \(S\) 数组的差分数组、\(X\) 数组">
+<meta property="og:type" content="article">
+<meta property="og:title" content="OJ-haizeiOJ-330">
+<meta property="og:url" content="http://stabunkow.github.io/blog/2021/03/09/OJ-haizeiOJ-330/index.html">
+<meta property="og:site_name" content="Hauk&#39;s Blog">
+<meta property="og:description" content="加强的整数问题  输入 12345 21 5 3 2 4C 1 5 1Q 1 5 输出 120 题解 原数组：\({a_1, a_2,a_3,....,a_n}\) 前缀和数组：\(S_i&#x3D;\sum\limits_{k&#x3D;1}^{k&#x3D;i}{a_i}, a_i&#x3D;S_i-S_{i-1}\) 差分数组：\(X_i&#x3D;a_i-a_{i-1}\) \(a\) 数组是 \(S\) 数组的差分数组、\(X\) 数组">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210309162947998.png">
+<meta property="article:published_time" content="2021-03-09T10:27:41.000Z">
+<meta property="article:modified_time" content="2021-03-09T11:40:25.498Z">
+<meta property="article:author" content="Hauk">
+<meta property="article:tag" content="OJ">
+<meta property="article:tag" content="haizeiOJ">
+<meta property="article:tag" content="树状数组">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210309162947998.png">
+
+
+<link rel="canonical" href="http://stabunkow.github.io/blog/2021/03/09/OJ-haizeiOJ-330/">
+
+
+<script class="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+<title>OJ-haizeiOJ-330 | Hauk's Blog</title>
+  
+
+
+
+
+  <noscript>
+  <style>
+  body { margin-top: 2rem; }
+
+  .use-motion .menu-item,
+  .use-motion .sidebar,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header {
+    visibility: visible;
+  }
+
+  .use-motion .header,
+  .use-motion .site-brand-container .toggle,
+  .use-motion .footer { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle,
+  .use-motion .custom-logo-image {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line {
+    transform: scaleX(1);
+  }
+
+  .search-pop-overlay, .sidebar-nav { display: none; }
+  .sidebar-panel { display: block; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/blog/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <h1 class="site-title">Hauk's Blog</h1>
+      <i class="logo-line"></i>
+    </a>
+      <p class="site-subtitle" itemprop="description">~ o ha yo ~</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%8A%A0%E5%BC%BA%E7%9A%84%E6%95%B4%E6%95%B0%E9%97%AE%E9%A2%98"><span class="nav-number">1.</span> <span class="nav-text">加强的整数问题</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A2%98%E8%A7%A3"><span class="nav-number">1.1.</span> <span class="nav-text">题解</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Hauk</p>
+  <div class="site-description" itemprop="description">Try to write something.</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/blog/archives">
+          <span class="site-state-item-count">43</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">24</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://stabunkow.github.io/blog/2021/03/09/OJ-haizeiOJ-330/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/blog/images/avatar.gif">
+      <meta itemprop="name" content="Hauk">
+      <meta itemprop="description" content="Try to write something.">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Hauk's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          OJ-haizeiOJ-330
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+      
+
+      <time title="创建时间：2021-03-09 18:27:41 / 修改时间：19:40:25" itemprop="dateCreated datePublished" datetime="2021-03-09T18:27:41+08:00">2021-03-09</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="加强的整数问题"><a target="_blank" rel="noopener" href="http://oj.haizeix.com/problem/330">加强的整数问题</a></h1>
+<p><img src="https://hauk-blog.oss-cn-hangzhou.aliyuncs.com/blogimage-20210309162947998.png" /></p>
+<p><strong>输入</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">5 2</span><br><span class="line">1 5 3 2 4</span><br><span class="line">C 1 5 1</span><br><span class="line">Q 1 5</span><br></pre></td></tr></table></figure>
+<p><strong>输出</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">20</span><br></pre></td></tr></table></figure>
+<h2 id="题解">题解</h2>
+<p>原数组：<span class="math inline">\({a_1, a_2,a_3,....,a_n}\)</span></p>
+<p>前缀和数组：<span class="math inline">\(S_i=\sum\limits_{k=1}^{k=i}{a_i}, a_i=S_i-S_{i-1}\)</span></p>
+<p>差分数组：<span class="math inline">\(X_i=a_i-a_{i-1}\)</span></p>
+<p><span class="math inline">\(a\)</span> 数组是 <span class="math inline">\(S\)</span> 数组的差分数组、<span class="math inline">\(X\)</span> 数组的前缀和数组</p>
+<p><span class="math inline">\(Query(l, r) = S(r) - S(l - 1)\)</span></p>
+<p><span class="math inline">\(S_i= \sum\limits_{k=1}^{i}\sum\limits_{y=1}^{k}{X_y} = \sum\limits_{k=1}^{i}{(i + 1)X_k-k*X_k}=(i + 1)\sum\limits_{k=1}^{i}{X_k-\sum\limits_{k=1}^{i}k*X_k}\)</span></p>
+<p>设 <span class="math inline">\(Y_i = i \times X_i, S_i=(i + 1)\sum\limits_{k=1}^{i}{X_k-\sum\limits_{k=1}^{i}{Y_k}}\)</span>，维护 <span class="math inline">\(X, Y\)</span> 两个序列的树状数组</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> MAX_N 100000</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> lowbit(x) (x &amp; -x)</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">long</span> <span class="keyword">long</span> c[<span class="number">2</span>][MAX_N + <span class="number">5</span>];</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">add</span><span class="params">(<span class="keyword">long</span> <span class="keyword">long</span> k, <span class="keyword">long</span> <span class="keyword">long</span> i, <span class="keyword">long</span> <span class="keyword">long</span> x, <span class="keyword">long</span> <span class="keyword">long</span> n)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (i &lt;= n) &#123;</span><br><span class="line">        c[k][i] += x;</span><br><span class="line">        i += lowbit(x);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">long</span> <span class="keyword">long</span> <span class="title">query</span><span class="params">(<span class="keyword">long</span> <span class="keyword">long</span> k, <span class="keyword">long</span> <span class="keyword">long</span> i)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">long</span> sum = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (i) &#123;</span><br><span class="line">        sum += c[k][i];</span><br><span class="line">        i -= lowbit(i);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> sum;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">long</span> <span class="keyword">long</span> <span class="title">S</span><span class="params">(<span class="keyword">long</span> <span class="keyword">long</span> i)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (i + <span class="number">1</span>) * query(<span class="number">0</span>, i) - query(<span class="number">1</span>, i);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">modify</span><span class="params">(<span class="keyword">long</span> <span class="keyword">long</span> i, <span class="keyword">long</span> <span class="keyword">long</span> x, <span class="keyword">long</span> <span class="keyword">long</span> n)</span> </span>&#123;</span><br><span class="line">    add(<span class="number">0</span>, i, x, n);</span><br><span class="line">    add(<span class="number">1</span>, i, i * x, n);</span><br><span class="line">    <span class="keyword">return</span> ;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> <span class="keyword">long</span> n, m;</span><br><span class="line">    <span class="built_in">scanf</span>(<span class="string">&quot;%lld%lld&quot;</span>, &amp;n, &amp;m);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">long</span> <span class="keyword">long</span> i = <span class="number">1</span>, pre = <span class="number">0</span>, a; i &lt;= n; ++i) &#123;</span><br><span class="line">        <span class="built_in">scanf</span>(<span class="string">&quot;%lld&quot;</span>, &amp;a);</span><br><span class="line">        <span class="comment">// 维护差分值</span></span><br><span class="line">        modify(i, a - pre, n);</span><br><span class="line">        pre = a;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">char</span> s[<span class="number">10</span>];</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">long</span> <span class="keyword">long</span> i = <span class="number">0</span>, l, r, d; i &lt; m; ++i) &#123;</span><br><span class="line">        <span class="built_in">scanf</span>(<span class="string">&quot;%s&quot;</span>, s);</span><br><span class="line">        <span class="keyword">switch</span>(s[<span class="number">0</span>]) &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;C&#x27;</span>:</span><br><span class="line">                <span class="built_in">scanf</span>(<span class="string">&quot;%lld%lld%lld&quot;</span>, &amp;l, &amp;r, &amp;d);</span><br><span class="line">                <span class="comment">// 对差分数组两次单点修改，作为对原数组的区间修改</span></span><br><span class="line">                modify(l, d, n);</span><br><span class="line">                modify(r + <span class="number">1</span>, -d, n);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">&#x27;Q&#x27;</span>:</span><br><span class="line">                <span class="built_in">scanf</span>(<span class="string">&quot;%lld%lld&quot;</span>, &amp;l, &amp;r);</span><br><span class="line">                <span class="built_in">printf</span>(<span class="string">&quot;%lld\n&quot;</span>, (S(r) - S(l - <span class="number">1</span>)));</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/blog/tags/OJ/" rel="tag"># OJ</a>
+              <a href="/blog/tags/haizeiOJ/" rel="tag"># haizeiOJ</a>
+              <a href="/blog/tags/%E6%A0%91%E7%8A%B6%E6%95%B0%E7%BB%84/" rel="tag"># 树状数组</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/blog/2021/03/09/OJ-haizeiOJ-329/" rel="prev" title="OJ-haizeiOJ-329">
+                  <i class="fa fa-chevron-left"></i> OJ-haizeiOJ-329
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/blog/2021/03/09/OJ-haizeiOJ-331/" rel="next" title="OJ-haizeiOJ-331">
+                  OJ-haizeiOJ-331 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      const activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      const commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Hauk</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script src="/blog/js/utils.js"></script><script src="/blog/js/motion.js"></script><script src="/blog/js/schemes/muse.js"></script><script src="/blog/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+  <script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'none'
+      },
+      options: {
+        renderActions: {
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              const target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3.1.2/es5/tex-mml-chtml.js';
+    script.defer = true;
+    document.head.appendChild(script);
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.typesetClear();
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+
+
+</body>
+</html>
