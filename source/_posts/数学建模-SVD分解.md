@@ -103,5 +103,3 @@ function [] = photo_compress(photo_address, save_address, ratio, greycompress)
     imwrite(uint8(compress_img), save_address);
 end
 ```
-
-# 
